@@ -76,9 +76,15 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
 
     // hilt
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+
+    // retrofit
+    implementation(libs.retrofit)
+
+    // Gson
+    implementation(libs.converter.gson)
 }
 
 // Allow references to generated code

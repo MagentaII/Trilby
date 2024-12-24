@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.trilby.data.sources.network.AppShortDef
+import com.example.trilby.data.sources.network.Meta
 import com.example.trilby.data.sources.network.NetworkWords
 import com.example.trilby.ui.navigation.Route
 
@@ -33,13 +35,13 @@ fun WordCard(
         border = BorderStroke(1.dp, Color.LightGray),
         onClick = {
             onNavigateToDetail(
-                Route.WordDetail(id = word.id),
-                word.id
+                Route.WordDetail(id = word.meta.id),
+                word.meta.id
             )
         },
     ) {
         Text(
-            text = word.headword,
+            text = word.meta.appShortDef.headword,
             style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Medium),
             modifier = Modifier.padding(start = 17.dp, top = 20.dp, bottom = 20.dp)
         )
@@ -51,10 +53,14 @@ fun WordCard(
 @Composable
 private fun WordCardView() {
     val defaultWord = NetworkWords(
-        id = "apple",
-        headword = "apple",
-        label = "noun",
-        definition = "{bc} a round fruit with red, yellow, or green skin and firm white flesh"
+        meta = Meta(
+            id = "apple",
+            appShortDef = AppShortDef(
+                headword = "apple",
+                label = "noun",
+                definition = listOf("{bc} a round fruit with red, yellow, or green skin and firm white flesh")
+            )
+        )
     )
     WordCard(
         defaultWord,

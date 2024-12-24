@@ -78,7 +78,7 @@ fun TrilbySearchBar(
 //                        text = newValue
                         viewModel.changeSearchQuery(newValue)
                         Log.i("TAG", "正在搜尋(正在輸入): $newValue")
-                        viewModel.search()
+//                        viewModel.search()
                         Log.d("TAG", "TrilbySearchBar, : ${dictionaryUiState.words}")
                     },
                     singleLine = true,

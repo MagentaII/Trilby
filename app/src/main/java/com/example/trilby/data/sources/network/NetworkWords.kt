@@ -1,24 +1,26 @@
 package com.example.trilby.data.sources.network
 
-import kotlinx.serialization.SerialName
+import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class NetworkWords(
+    val meta: Meta,
+)
+
+@Serializable
+data class Meta(
     val id: String,
-    @SerialName(value = "hw")
+    @SerializedName(value = "app-shortdef")
+    val appShortDef: AppShortDef,
+)
+
+@Serializable
+data class AppShortDef(
+    @SerializedName(value = "hw")
     val headword: String,
-    @SerialName(value = "fl")
+    @SerializedName(value = "fl")
     val label: String,
-    @SerialName(value = "def")
-    val definition: String,
-) {
-    companion object {
-        fun empty(): NetworkWords = NetworkWords(
-            id = "",
-            headword = "",
-            label = "",
-            definition = ""
-        )
-    }
-}
+    @SerializedName(value = "def")
+    val definition: List<String>,
+)

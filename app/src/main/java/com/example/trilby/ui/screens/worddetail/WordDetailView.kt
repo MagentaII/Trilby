@@ -23,6 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.trilby.data.sources.network.AppShortDef
+import com.example.trilby.data.sources.network.Meta
 import com.example.trilby.data.sources.network.NetworkWords
 import com.example.trilby.ui.navigation.Route
 
@@ -37,9 +39,9 @@ fun WordDetailView(
             .fillMaxSize()
             .padding(horizontal = 17.dp, vertical = 28.dp)
     ) {
-        val word = words.find { it.id == wordDetail.id }
+        val word = words.find { it.meta.id == wordDetail.id }
         Text(
-            text = word?.headword ?: "headword error",
+            text = word?.meta?.appShortDef?.headword ?: "headword error",
             style = TextStyle(fontSize = 40.sp, fontWeight = FontWeight.Medium),
         )
 
@@ -53,7 +55,7 @@ fun WordDetailView(
                 .padding(end = 24.dp)
         ) {
             Text(
-                text = word?.label ?: "label error",
+                text = word?.meta?.appShortDef?.label ?: "label error",
                 style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Medium),
             )
             IconButton(
@@ -69,14 +71,17 @@ fun WordDetailView(
 
         Spacer(Modifier.height(28.dp))
 
-        Text(
-            text = word?.definition ?: "definition error",
-            style = TextStyle(
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium,
-                lineHeight = 32.sp
-            ),
-        )
+        val definitions = word?.meta?.appShortDef?.definition ?: listOf("definition error")
+        definitions.forEach { definition ->
+            Text(
+                text = definition,
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    lineHeight = 32.sp
+                ),
+            )
+        }
         Spacer(Modifier.height(24.dp))
         Divider()
     }
@@ -86,11 +91,15 @@ fun WordDetailView(
 @Composable
 private fun WordDetailViewPreview() {
     val defaultWord = NetworkWords(
-        id = "apple",
-        headword = "apple",
-        label = "noun",
-        definition = "{bc} a round fruit with red, yellow, or green skin and firm white flesh"
+        meta = Meta(
+            id = "apple",
+            appShortDef = AppShortDef(
+                headword = "apple",
+                label = "noun",
+                definition = listOf("{bc} a round fruit with red, yellow, or green skin and firm white flesh")
+            )
+        )
     )
-    val wordDetail = Route.WordDetail(defaultWord.id)
+    val wordDetail = Route.WordDetail(defaultWord.meta.id)
     WordDetailView(wordDetail)
 }

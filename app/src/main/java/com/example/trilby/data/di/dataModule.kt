@@ -2,13 +2,17 @@ package com.example.trilby.data.di
 
 import com.example.trilby.data.repositories.WordRepository
 import com.example.trilby.data.repositories.WordRepositoryImpl
-import com.example.trilby.data.sources.network.NetworkDataSource
-import com.example.trilby.data.sources.network.WordsNetworkDataSource
+import com.example.trilby.data.sources.network.DictionaryApiService
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
+
+private const val BASE_URL = "https://www.dictionaryapi.com/"
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -23,11 +27,15 @@ abstract class RepositoryModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class NetworkDataSourceModule {
+object NetworkDataSourceModule {
 
     @Singleton
-    @Binds
-    abstract fun bindNetworkDataSource(
-        wordsNetworkDataSource: WordsNetworkDataSource
-    ): NetworkDataSource
+    @Provides
+    fun providerNetworkDataSource(): DictionaryApiService {
+        return Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(BASE_URL)
+            .build()
+            .create(DictionaryApiService::class.java)
+    }
 }
