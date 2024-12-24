@@ -10,7 +10,8 @@ import androidx.compose.ui.Modifier
 @Composable
 fun FavoritesView(modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Text("Favorites Screen")
