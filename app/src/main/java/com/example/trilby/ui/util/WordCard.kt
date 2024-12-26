@@ -16,15 +16,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.trilby.data.sources.network.AppShortDef
-import com.example.trilby.data.sources.network.Meta
-import com.example.trilby.data.sources.network.NetworkWords
+import com.example.trilby.data.repositories.Word
 import com.example.trilby.ui.navigation.Route
 
 @Composable
 fun WordCard(
-    word: NetworkWords,
-    onNavigateToDetail: (route: Route, name: String) -> Unit,
+    word: Word,
+    onNavigateToDetail: (route: Route, word: Word) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -35,13 +33,18 @@ fun WordCard(
         border = BorderStroke(1.dp, Color.LightGray),
         onClick = {
             onNavigateToDetail(
-                Route.WordDetail(id = word.meta.id),
-                word.meta.id
+                Route.WordDetail(
+                    id = word.id,
+                    headword = word.headword,
+                    label = word.label,
+                    definition = word.definition,
+                ),
+                word
             )
         },
     ) {
         Text(
-            text = word.meta.appShortDef.headword,
+            text = word.headword,
             style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Medium),
             modifier = Modifier.padding(start = 17.dp, top = 20.dp, bottom = 20.dp)
         )
@@ -52,16 +55,13 @@ fun WordCard(
 @Preview
 @Composable
 private fun WordCardView() {
-    val defaultWord = NetworkWords(
-        meta = Meta(
-            id = "apple",
-            appShortDef = AppShortDef(
-                headword = "apple",
-                label = "noun",
-                definition = listOf("{bc} a round fruit with red, yellow, or green skin and firm white flesh")
-            )
-        )
+    val defaultWord = Word(
+        id = "apple",
+        headword = "apple",
+        label = "noun",
+        definition = listOf("{bc} a round fruit with red, yellow, or green skin and firm white flesh")
     )
+
     WordCard(
         defaultWord,
         onNavigateToDetail = { route, name ->

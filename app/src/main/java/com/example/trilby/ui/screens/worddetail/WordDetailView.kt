@@ -1,5 +1,6 @@
 package com.example.trilby.ui.screens.worddetail
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,25 +24,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.trilby.data.sources.network.AppShortDef
-import com.example.trilby.data.sources.network.Meta
-import com.example.trilby.data.sources.network.NetworkWords
 import com.example.trilby.ui.navigation.Route
 
 @Composable
 fun WordDetailView(
     wordDetail: Route.WordDetail,
-    words: List<NetworkWords> = emptyList(),
+//    viewModel: WordDetailViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
+//    LaunchedEffect(Unit) {
+//        viewModel.changeWord(wordDetail.id)
+//    }
+//    val wordDetailUiState by viewModel.uiState.collectAsState()
+//    val words = wordDetailUiState.words
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 17.dp, vertical = 28.dp)
     ) {
-        val word = words.find { it.meta.id == wordDetail.id }
+//        val word = words.find { it.id == wordDetail.id }
+        Log.i("TAG", "WordDetailView, word: $wordDetail.word")
         Text(
-            text = word?.meta?.appShortDef?.headword ?: "headword error",
+            text = wordDetail.headword ?: "headword error",
             style = TextStyle(fontSize = 40.sp, fontWeight = FontWeight.Medium),
         )
 
@@ -55,7 +59,7 @@ fun WordDetailView(
                 .padding(end = 24.dp)
         ) {
             Text(
-                text = word?.meta?.appShortDef?.label ?: "label error",
+                text = wordDetail.label ?: "label error",
                 style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Medium),
             )
             IconButton(
@@ -71,7 +75,7 @@ fun WordDetailView(
 
         Spacer(Modifier.height(28.dp))
 
-        val definitions = word?.meta?.appShortDef?.definition ?: listOf("definition error")
+        val definitions = wordDetail.definition ?: listOf("definition error")
         definitions.forEach { definition ->
             Text(
                 text = definition,
@@ -90,16 +94,18 @@ fun WordDetailView(
 @Preview(showBackground = true)
 @Composable
 private fun WordDetailViewPreview() {
-    val defaultWord = NetworkWords(
-        meta = Meta(
-            id = "apple",
-            appShortDef = AppShortDef(
-                headword = "apple",
-                label = "noun",
-                definition = listOf("{bc} a round fruit with red, yellow, or green skin and firm white flesh")
-            )
-        )
+//    val defaultWord = Word(
+//        id = "apple",
+//        headword = "apple",
+//        label = "noun",
+//        definition = listOf("{bc} a round fruit with red, yellow, or green skin and firm white flesh")
+//    )
+
+    val wordDetail = Route.WordDetail(
+        id = "apple",
+        headword = "apple",
+        label = "noun",
+        definition = listOf("{bc} a round fruit with red, yellow, or green skin and firm white flesh")
     )
-    val wordDetail = Route.WordDetail(defaultWord.meta.id)
     WordDetailView(wordDetail)
 }

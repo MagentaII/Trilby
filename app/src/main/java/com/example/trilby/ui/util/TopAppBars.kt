@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -100,6 +101,9 @@ fun AddSearchBarTopAppBar(
 fun DetailTopAppBar(
     title: String,
     onPopBack: () -> Unit,
+    saveWord: () -> Unit,
+    deleteWord: () -> Unit,
+    isSaveWord: Boolean,
     modifier: Modifier = Modifier
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -139,17 +143,33 @@ fun DetailTopAppBar(
             },
             actions = {
                 IconButton(
-                    onClick = {},
+                    onClick = {
+                        if (isSaveWord) {
+                            deleteWord()
+                        } else {
+                            saveWord()
+                        }
+                    },
                     modifier = Modifier
                         .padding(top = 16.dp, end = 16.dp)
                 ) {
-                    Icon(
-                        Icons.Filled.StarOutline,
-                        contentDescription = "",
-                        modifier = Modifier
-                            .size(36.dp),
-                        tint = Color.White
-                    )
+                    if (isSaveWord) {
+                        Icon(
+                            Icons.Filled.Star,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .size(36.dp),
+                            tint = Color(0xFFFCEFBC)
+                        )
+                    } else {
+                        Icon(
+                            Icons.Filled.StarOutline,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .size(36.dp),
+                            tint = Color.White
+                        )
+                    }
                 }
 
             },
@@ -180,7 +200,13 @@ private fun AddSearchBarTopAppBarPreview() {
 private fun DetailTopAppBarPreview() {
     TrilbyTheme {
         Surface {
-            DetailTopAppBar(title = "Apple", onPopBack = {})
+            DetailTopAppBar(
+                title = "Apple",
+                onPopBack = {},
+                saveWord = {},
+                deleteWord = {},
+                isSaveWord = true,
+            )
         }
     }
 }

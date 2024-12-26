@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class NetworkWords(
+data class NetworkWord(
     val meta: Meta,
 )
 

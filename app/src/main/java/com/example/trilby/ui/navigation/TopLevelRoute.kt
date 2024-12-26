@@ -10,24 +10,30 @@ import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.trilby.data.repositories.Word
 import kotlinx.serialization.Serializable
 
 
 sealed class Route {
     @Serializable
-    data object Dictionary: Route()
+    data object Dictionary : Route()
 
     @Serializable
-    data object Favorites: Route()
+    data object Favorites : Route()
 
     @Serializable
-    data object Practice: Route()
+    data object Practice : Route()
 
     @Serializable
-    data object Profile: Route()
+    data object Profile : Route()
 
     @Serializable
-    data class WordDetail(val id: String): Route()
+    data class WordDetail(
+        val id: String,
+        val headword: String,
+        val label: String,
+        val definition: List<String>,
+    ) : Route()
 }
 
 data class TopLevelRoute(

@@ -43,7 +43,7 @@ fun TrilbySearchBar(
 //    var text by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
     val focusRequester = FocusRequester()
-    val dictionaryUiState by viewModel.uiState.collectAsState()
+//    val trilbyAppUiState by viewModel.uiState.collectAsState()
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -79,7 +79,7 @@ fun TrilbySearchBar(
                         viewModel.changeSearchQuery(newValue)
                         Log.i("TAG", "正在搜尋(正在輸入): $newValue")
 //                        viewModel.search()
-                        Log.d("TAG", "TrilbySearchBar, : ${dictionaryUiState.words}")
+//                        Log.d("TAG", "TrilbySearchBar, : ${trilbyAppUiState.words}")
                     },
                     singleLine = true,
                     textStyle = TextStyle(
@@ -92,7 +92,7 @@ fun TrilbySearchBar(
                     ),
                     keyboardActions = KeyboardActions(
                         onSearch = {
-                            viewModel.search()
+                            viewModel.search(viewModel.searchQuery)
                             Log.i("TAG", "正在搜尋: ${viewModel.searchQuery}")
                             focusManager.clearFocus()
                         }

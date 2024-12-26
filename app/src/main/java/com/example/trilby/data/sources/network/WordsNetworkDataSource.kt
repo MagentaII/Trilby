@@ -13,5 +13,5 @@ interface DictionaryApiService {
     suspend fun searchWords(
         @Path("word") word: String,
         @Query("key") apiKey: String = YOUR_API_KEY,
-    ): List<NetworkWords>
+    ): List<NetworkWord>
 }

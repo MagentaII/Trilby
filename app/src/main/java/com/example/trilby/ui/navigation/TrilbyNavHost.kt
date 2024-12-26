@@ -1,12 +1,15 @@
 package com.example.trilby.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.trilby.data.repositories.Word
 import com.example.trilby.ui.TrilbyAppUiState
 import com.example.trilby.ui.screens.dictionary.DictionaryView
 import com.example.trilby.ui.screens.favorites.FavoritesView
@@ -18,7 +21,7 @@ import com.example.trilby.ui.screens.worddetail.WordDetailView
 fun TrilbyNavHost(
     trilbyAppUiState: TrilbyAppUiState,
     navController: NavHostController = rememberNavController(),
-    onNavigation: (route: Route, name: String) -> Unit,
+    onNavigation: (route: Route, word: Word) -> Unit,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -32,14 +35,18 @@ fun TrilbyNavHost(
                 onNavigateToDetail = onNavigation
             )
         }
-        composable<Route.Favorites> { FavoritesView() }
+        composable<Route.Favorites> {
+            FavoritesView(
+                onNavigateToDetail = onNavigation
+            )
+        }
         composable<Route.Practice> { PracticeView() }
         composable<Route.Profile> { ProfileView() }
         composable<Route.WordDetail> { backStateEntry ->
             val wordDetail: Route.WordDetail = backStateEntry.toRoute()
             WordDetailView(
                 wordDetail = wordDetail,
-                words = trilbyAppUiState.words,
+//                words = trilbyAppUiState.words,
             )
         }
     }

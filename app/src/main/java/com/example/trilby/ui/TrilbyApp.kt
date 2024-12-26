@@ -16,6 +16,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.trilby.data.repositories.Word
 import com.example.trilby.ui.navigation.Route
 import com.example.trilby.ui.navigation.TrilbyNavHost
 import com.example.trilby.ui.theme.TrilbyTheme
@@ -38,7 +39,7 @@ fun TrilbyApp(
 
     var currentRoute by remember { mutableStateOf<Route>(Route.Dictionary) }
     var title by remember { mutableStateOf("Dictionary") }
-    var onNavigationTitle by remember { mutableStateOf("") }
+    var currentWord by remember { mutableStateOf(Word.empty) }
 
     LaunchedEffect(currentDestination) {
         currentDestination?.route?.let { route ->
@@ -68,8 +69,13 @@ fun TrilbyApp(
 
                     is Route.WordDetail -> {
                         Log.i("TAG", "TrilbyApp, Route.WordDetail: ")
-                        currentRoute = Route.WordDetail(id = "")
-                        title = onNavigationTitle
+                        currentRoute = Route.WordDetail(
+                            id = "",
+                            headword = "",
+                            label = "",
+                            definition = emptyList()
+                        )
+                        title = currentWord.id
                     }
                 }
             }
@@ -86,7 +92,10 @@ fun TrilbyApp(
 
                 is Route.WordDetail -> DetailTopAppBar(
                     title = title,
-                    onPopBack = { navController.popBackStack() }
+                    onPopBack = { navController.popBackStack() },
+                    saveWord = { viewModel.saveWord(word = currentWord) },
+                    deleteWord = { viewModel.deleteWord(word = currentWord) },
+                    isSaveWord = trilbyAppUiState.isFavorite,
                 )
 
                 else -> DefaultTopAppBar(
@@ -121,21 +130,29 @@ fun TrilbyApp(
             navController = navController,
             trilbyAppUiState = trilbyAppUiState,
             modifier = Modifier.padding(innerPadding),
-            onNavigation = { route, name ->
-                onNavigationTitle = name
+            onNavigation = { route, word ->
+                currentWord = word
                 navController.navigate(route)
+                viewModel.isWordExist(word)
             },
         )
     }
 }
 
 fun formatRoute(route: String): Route? {
+    Log.d("TAG", "formatRoute, route: $route")
     return when {
         route.endsWith("Route.Dictionary") -> Route.Dictionary
         route.endsWith("Route.Favorites") -> Route.Favorites
         route.endsWith("Route.Practice") -> Route.Practice
         route.endsWith("Route.Profile") -> Route.Profile
-        route.endsWith("Route.WordDetail/{id}") -> Route.WordDetail(id = "")
+        route.endsWith("Route.WordDetail/{id}/{headword}/{label}?definition={definition}") -> Route.WordDetail(
+            id = "",
+            headword = "",
+            label = "",
+            definition = emptyList()
+        )
+
         else -> null // 未知路由返回 null
     }
 }
