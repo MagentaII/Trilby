@@ -10,7 +10,6 @@ import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.trilby.data.repositories.Word
 import kotlinx.serialization.Serializable
 
 
@@ -29,9 +28,10 @@ sealed class Route {
 
     @Serializable
     data class WordDetail(
-        val id: String,
-        val headword: String,
-        val label: String,
+        val uid: String,
+        val wordId: List<String>,
+        val headword: List<String>,
+        val label: List<String>,
         val definition: List<String>,
     ) : Route()
 }

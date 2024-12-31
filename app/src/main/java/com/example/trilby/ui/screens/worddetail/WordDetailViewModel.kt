@@ -3,12 +3,10 @@ package com.example.trilby.ui.screens.worddetail
 import androidx.lifecycle.ViewModel
 import com.example.trilby.data.repositories.Word
 import com.example.trilby.data.repositories.WordRepository
-import com.example.trilby.ui.screens.dictionary.DictionaryUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 data class WordDetailUiState(

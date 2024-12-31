@@ -1,26 +1,52 @@
 package com.example.trilby.data.sources.network
 
-import com.google.gson.annotations.SerializedName
-import kotlinx.serialization.Serializable
-
-@Serializable
 data class NetworkWord(
     val meta: Meta,
+    val hom: Int?,
+    val hwi: Hwi,
+    val fl: String,
+    val def: List<Definition>,
+    val shortdef: List<String>,
 )
 
-@Serializable
+/**
+ * Meta
+ */
 data class Meta(
     val id: String,
-    @SerializedName(value = "app-shortdef")
-    val appShortDef: AppShortDef,
+    val uuid: String,
+    val section: String,
+    val stems: List<String>,
+)
+/// ---------------------------------
+
+/**
+ * HeadwordInformation
+ */
+data class Hwi(
+    val hw: String,
+    val prs: List<Prs>
 )
 
-@Serializable
-data class AppShortDef(
-    @SerializedName(value = "hw")
-    val headword: String,
-    @SerializedName(value = "fl")
-    val label: String,
-    @SerializedName(value = "def")
-    val definition: List<String>,
+data class Prs(
+    val sound: Sound
 )
+
+data class Sound(
+    val audio: String,
+    val ref: String,
+    val stat: String
+)
+/// ---------------------------------
+
+/**
+ * Definition
+ */
+data class Definition(
+    val sseq: List<List<List<Any>>>,
+)
+
+data class Sense(
+    val sn: String,
+)
+/// ---------------------------------

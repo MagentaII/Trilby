@@ -11,14 +11,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.trilby.data.repositories.Word
+import com.example.trilby.data.repositories.ShowWord
 import com.example.trilby.ui.navigation.Route
 import com.example.trilby.ui.util.WordCard
 
 @Composable
 fun FavoritesView(
     viewModel: FavoritesViewModel = hiltViewModel(),
-    onNavigateToDetail: (route: Route, word: Word) -> Unit,
+    onNavigateToDetail: (route: Route, word: ShowWord) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val favoritesUiState by viewModel.uiState.collectAsState()

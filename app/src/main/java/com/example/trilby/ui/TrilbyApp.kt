@@ -16,7 +16,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.trilby.data.repositories.Word
+import com.example.trilby.data.repositories.ShowWord
 import com.example.trilby.ui.navigation.Route
 import com.example.trilby.ui.navigation.TrilbyNavHost
 import com.example.trilby.ui.theme.TrilbyTheme
@@ -39,7 +39,7 @@ fun TrilbyApp(
 
     var currentRoute by remember { mutableStateOf<Route>(Route.Dictionary) }
     var title by remember { mutableStateOf("Dictionary") }
-    var currentWord by remember { mutableStateOf(Word.empty) }
+    var currentWord by remember { mutableStateOf(ShowWord.empty) }
 
     LaunchedEffect(currentDestination) {
         currentDestination?.route?.let { route ->
@@ -70,12 +70,13 @@ fun TrilbyApp(
                     is Route.WordDetail -> {
                         Log.i("TAG", "TrilbyApp, Route.WordDetail: ")
                         currentRoute = Route.WordDetail(
-                            id = "",
-                            headword = "",
-                            label = "",
+                            uid = "",
+                            wordId = emptyList(),
+                            headword = emptyList(),
+                            label = emptyList(),
                             definition = emptyList()
                         )
-                        title = currentWord.id
+                        title = currentWord.uid
                     }
                 }
             }
@@ -146,12 +147,20 @@ fun formatRoute(route: String): Route? {
         route.endsWith("Route.Favorites") -> Route.Favorites
         route.endsWith("Route.Practice") -> Route.Practice
         route.endsWith("Route.Profile") -> Route.Profile
-        route.endsWith("Route.WordDetail/{id}/{headword}/{label}?definition={definition}") -> Route.WordDetail(
-            id = "",
-            headword = "",
-            label = "",
+        route.endsWith("Route.WordDetail/{uid}?wordId={wordId}&headword={headword}&label={label}&definition={definition}") -> Route.WordDetail(
+            uid = "",
+            wordId = emptyList(),
+            headword = emptyList(),
+            label = emptyList(),
             definition = emptyList()
         )
+//        route.endsWith("Route.WordDetail/{id}/{headword}/{label}?definition={definition}") -> Route.WordDetail(
+//            uid = "",
+//            wordId = emptyList(),
+//            headword = emptyList(),
+//            label = emptyList(),
+//            definition = emptyList()
+//        )
 
         else -> null // 未知路由返回 null
     }

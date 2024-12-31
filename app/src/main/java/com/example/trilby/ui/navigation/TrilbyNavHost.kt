@@ -1,15 +1,13 @@
 package com.example.trilby.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.trilby.data.repositories.Word
+import com.example.trilby.data.repositories.ShowWord
 import com.example.trilby.ui.TrilbyAppUiState
 import com.example.trilby.ui.screens.dictionary.DictionaryView
 import com.example.trilby.ui.screens.favorites.FavoritesView
@@ -21,7 +19,7 @@ import com.example.trilby.ui.screens.worddetail.WordDetailView
 fun TrilbyNavHost(
     trilbyAppUiState: TrilbyAppUiState,
     navController: NavHostController = rememberNavController(),
-    onNavigation: (route: Route, word: Word) -> Unit,
+    onNavigation: (route: Route, word: ShowWord) -> Unit,
     modifier: Modifier = Modifier
 ) {
     NavHost(

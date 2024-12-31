@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.trilby.data.repositories.Word
+import com.example.trilby.data.repositories.ShowWord
 import com.example.trilby.data.repositories.WordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class TrilbyAppUiState(
-    val words: List<Word> = emptyList(),
+    val words: List<ShowWord> = emptyList(),
     val isFavorite: Boolean = false,
 )
 
@@ -46,21 +46,21 @@ class TrilbyAppViewModel @Inject constructor(
         }
     }
 
-    fun saveWord(word: Word) {
+    fun saveWord(word: ShowWord) {
         viewModelScope.launch {
             repository.saveWord(word = word)
             isWordExist(word)
         }
     }
 
-    fun deleteWord(word: Word) {
+    fun deleteWord(word: ShowWord) {
         viewModelScope.launch {
             repository.deleteWord(word = word)
             isWordExist(word)
         }
     }
 
-    fun isWordExist(word: Word) {
+    fun isWordExist(word: ShowWord) {
         viewModelScope.launch {
             val isExist = repository.isWordExist(word = word)
             _uiState.update { currentState ->

@@ -14,8 +14,14 @@ interface WordDao {
     @Insert
     suspend fun insertWord(word: LocalWord)
 
+    @Insert
+    suspend fun insertWords(words: List<LocalWord>)
+
     @Delete
     suspend fun deleteWord(word: LocalWord)
+
+    @Delete
+    suspend fun deleteWords(words: List<LocalWord>)
 
     @Query("SELECT * FROM LocalWord")
     suspend fun getAllWords(): List<LocalWord>
