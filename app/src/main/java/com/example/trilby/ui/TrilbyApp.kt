@@ -78,6 +78,10 @@ fun TrilbyApp(
                         )
                         title = currentWord.uid
                     }
+
+                    else -> {
+                        Log.i("TAG", "TrilbyApp, Route.else: ")
+                    }
                 }
             }
         }
@@ -131,7 +135,7 @@ fun TrilbyApp(
             navController = navController,
             trilbyAppUiState = trilbyAppUiState,
             modifier = Modifier.padding(innerPadding),
-            onNavigation = { route, word ->
+            onNavigateToDetail = { route, word ->
                 currentWord = word
                 navController.navigate(route)
                 viewModel.isWordExist(word)

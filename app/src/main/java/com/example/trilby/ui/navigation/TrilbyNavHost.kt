@@ -5,7 +5,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.trilby.data.repositories.ShowWord
 import com.example.trilby.ui.TrilbyAppUiState
@@ -18,10 +17,11 @@ import com.example.trilby.ui.screens.worddetail.WordDetailView
 @Composable
 fun TrilbyNavHost(
     trilbyAppUiState: TrilbyAppUiState,
-    navController: NavHostController = rememberNavController(),
-    onNavigation: (route: Route, word: ShowWord) -> Unit,
-    modifier: Modifier = Modifier
+    navController: NavHostController,
+    onNavigateToDetail: (route: Route, word: ShowWord) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
+
     NavHost(
         navController = navController,
         startDestination = Route.Dictionary,
@@ -30,12 +30,12 @@ fun TrilbyNavHost(
         composable<Route.Dictionary> {
             DictionaryView(
                 words = trilbyAppUiState.words,
-                onNavigateToDetail = onNavigation
+                onNavigateToDetail = onNavigateToDetail
             )
         }
         composable<Route.Favorites> {
             FavoritesView(
-                onNavigateToDetail = onNavigation
+                onNavigateToDetail = onNavigateToDetail
             )
         }
         composable<Route.Practice> { PracticeView() }

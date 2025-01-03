@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "228324269163",
+    "project_id": "trilby-ed0fd",
+    "storage_bucket": "trilby-ed0fd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:228324269163:android:0acb40a036c7f5d9ed652e",
+        "android_client_info": {
+          "package_name": "com.example.trilby"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2crVZxmdSHCndX712bULeo_YLfxOjMgA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

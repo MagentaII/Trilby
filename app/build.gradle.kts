@@ -6,6 +6,7 @@ plugins {
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -56,6 +57,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.firebase.auth.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -64,10 +66,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // nav
+    /// nav
     implementation(libs.androidx.navigation.compose)
 
-    // JSON serialization library, works with the Kotlin serialization plugin
+    /// JSON serialization library, works with the Kotlin serialization plugin
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.androidx.material)
@@ -76,18 +78,18 @@ dependencies {
 
     implementation(libs.androidx.material.icons.extended)
 
-    // hilt
+    /// hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
-    // retrofit
+    /// retrofit
     implementation(libs.retrofit)
 
-    // Gson
+    /// Gson
     implementation(libs.converter.gson)
 
-    // Room
+    /// Room
     val room_version = "2.6.1"
 
     implementation("androidx.room:room-runtime:$room_version")
@@ -102,6 +104,14 @@ dependencies {
 
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:$room_version")
+
+    /// Firebase
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+
+    // TODO: Add the dependencies for Firebase products you want to use
+    // When using the BoM, don't specify versions in Firebase dependencies
+    implementation("com.google.firebase:firebase-analytics")
 }
 
 // Allow references to generated code
