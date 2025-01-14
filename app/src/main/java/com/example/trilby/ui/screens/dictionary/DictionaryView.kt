@@ -5,30 +5,45 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.trilby.data.repositories.ShowWord
+import com.example.trilby.data.repositories.word_repository.ShowWord
 import com.example.trilby.ui.navigation.Route
+import com.example.trilby.ui.navigation.SharedViewModel
 import com.example.trilby.ui.util.WordCard
 
 @Composable
 fun DictionaryView(
     viewModel: DictionaryViewModel = hiltViewModel(),
+    sharedViewModel: SharedViewModel,
     words: List<ShowWord>,
     onNavigateToDetail: (route: Route, word: ShowWord) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    viewModel.changeWords(words)
+    LaunchedEffect(words) {
+        Log.i("TAG", "DictionaryView, words change: $words")
+        viewModel.changeWords(words)
+        sharedViewModel.updateWords(words)
+    }
+
+    if (words.isNotEmpty()) {
+        Log.i("TAG", "DictionaryView, word: ${words[0].toString()}")
+    } else {
+        Log.i("TAG", "DictionaryView, words list is empty")
+    }
+
     val dictionaryUiState by viewModel.uiState.collectAsState()
-    val words = dictionaryUiState.words
+    val showWords = dictionaryUiState.words
+
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
     ) {
-        items(words) { word ->
+        items(showWords) { word ->
             WordCard(word, onNavigateToDetail = onNavigateToDetail)
         }
     }
@@ -39,9 +54,10 @@ fun DictionaryView(
 @Composable
 private fun DictionaryPreview() {
     DictionaryView(
+        sharedViewModel = hiltViewModel(),
         words = emptyList(),
         onNavigateToDetail = { route, word ->
-            Log.i("TAG", "DictionaryPreview, route, name: $route and ${word.headword}")
+            Log.i("TAG", "DictionaryPreview, route, name: $route and ${word.uid}")
         }
     )
 }

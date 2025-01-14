@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.trilby.data.repositories.ShowWord
+import com.example.trilby.data.repositories.word_repository.ShowWord
 import com.example.trilby.ui.navigation.Route
 
 @Composable
@@ -35,16 +35,6 @@ fun WordCard(
             onNavigateToDetail(
                 Route.WordDetail(
                     uid = word.uid,
-                    wordId = word.wordId,
-                    headword = word.headword,
-                    label = word.label,
-                    definition = word.definition.map { it.joinToString("\n") }
-//                    definition = word.label.zip(
-//                        word.definition.map {
-//                            it.joinToString("\n")
-//                        }
-//                    ).toMap()
-//                    definition = word.label.zip(word.definition).toMap()
                 ),
                 word
             )
@@ -64,26 +54,30 @@ fun WordCard(
 private fun WordCardView() {
     val defaultWord = ShowWord(
         uid = "book",
-        wordId = listOf("book:1", "book:2", "book:3"),
-        headword = listOf("book", "book", "book"),
-        label = listOf("noun", "adjective", "verb"),
-        definition = listOf(
-            listOf(
-                "a set of written sheets of skin or paper or tablets of wood or ivory",
-                "a set of written, printed, or blank sheets bound together between a front and back cover",
-                "a long written or printed literary composition",
-            ),
-            listOf(
-                "derived from books and not from practical experience",
-                "shown by ledgers"
-            ),
-            listOf(
-                "to register (something, such as a name) for some future activity or condition (as to engage transportation or reserve lodgings)",
-                "to schedule engagements for",
-                "to set aside time for"
-            )
-        )
+        words = emptyList()
     )
+//    val defaultWord = ShowWord(
+//        uid = "book",
+//        wordId = listOf("book:1", "book:2", "book:3"),
+//        headword = listOf("book", "book", "book"),
+//        label = listOf("noun", "adjective", "verb"),
+//        definition = listOf(
+//            listOf(
+//                "a set of written sheets of skin or paper or tablets of wood or ivory",
+//                "a set of written, printed, or blank sheets bound together between a front and back cover",
+//                "a long written or printed literary composition",
+//            ),
+//            listOf(
+//                "derived from books and not from practical experience",
+//                "shown by ledgers"
+//            ),
+//            listOf(
+//                "to register (something, such as a name) for some future activity or condition (as to engage transportation or reserve lodgings)",
+//                "to schedule engagements for",
+//                "to set aside time for"
+//            )
+//        )
+//    )
 
     WordCard(
         defaultWord,

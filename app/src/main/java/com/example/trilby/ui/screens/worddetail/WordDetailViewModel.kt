@@ -1,31 +1,26 @@
 package com.example.trilby.ui.screens.worddetail
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.trilby.data.repositories.Word
-import com.example.trilby.data.repositories.WordRepository
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+import com.example.trilby.data.repositories.word_repository.WordPrs
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
-data class WordDetailUiState(
-    val words: List<Word> = emptyList()
-)
 
 @HiltViewModel
 class WordDetailViewModel @Inject constructor(
-    private val repository: WordRepository
+    private val exoPlayer: ExoPlayer,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(WordDetailUiState())
-    val uiState: StateFlow<WordDetailUiState> = _uiState.asStateFlow()
 
-//    fun changeWord(id: String) {
-//        val words = repository.words;
-//        _uiState.update { currentState ->
-//            currentState.copy(
-//                words = words
-//            )
-//        }
-//    }
+    fun playWordAudio(wordPrs: WordPrs) {
+        val wordAudioUrl =
+            "https://media.merriam-webster.com/audio/prons/en/us/mp3/${wordPrs.sound?.subdirectory}/${wordPrs.sound?.audio}.mp3"
+        Log.i("TAG", "playWordAudio, wordAudioUrl: ${wordAudioUrl.toString()}")
+        val mediaItem = MediaItem.fromUri(wordAudioUrl)
+        exoPlayer.setMediaItem(mediaItem)
+        exoPlayer.prepare()
+        exoPlayer.play()
+    }
 }

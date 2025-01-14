@@ -1,4 +1,4 @@
-package com.example.trilby.data.sources.network
+package com.example.trilby.data.sources.network.word_network_source
 
 data class NetworkWord(
     val meta: Meta,
@@ -25,11 +25,12 @@ data class Meta(
  */
 data class Hwi(
     val hw: String,
-    val prs: List<Prs>
+    val prs: List<Prs>?
 )
 
 data class Prs(
-    val sound: Sound
+    val mw: String,
+    val sound: Sound?
 )
 
 data class Sound(
@@ -43,10 +44,6 @@ data class Sound(
  * Definition
  */
 data class Definition(
-    val sseq: List<List<List<Any>>>,
-)
-
-data class Sense(
-    val sn: String,
+    val sseq: List<List<List<Any>>>
 )
 /// ---------------------------------

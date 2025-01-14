@@ -16,7 +16,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.trilby.data.repositories.ShowWord
+import com.example.trilby.data.repositories.word_repository.ShowWord
 import com.example.trilby.ui.navigation.Route
 import com.example.trilby.ui.navigation.TrilbyNavHost
 import com.example.trilby.ui.theme.TrilbyTheme
@@ -27,6 +27,7 @@ import com.example.trilby.ui.util.TrilbyBottomNavigationBar
 
 @Composable
 fun TrilbyApp(
+    onNavigateToLogin: (route: Route) -> Unit,
     viewModel: TrilbyAppViewModel = hiltViewModel(),
 ) {
     // Navigation
@@ -71,10 +72,10 @@ fun TrilbyApp(
                         Log.i("TAG", "TrilbyApp, Route.WordDetail: ")
                         currentRoute = Route.WordDetail(
                             uid = "",
-                            wordId = emptyList(),
-                            headword = emptyList(),
-                            label = emptyList(),
-                            definition = emptyList()
+//                            wordId = emptyList(),
+//                            headword = emptyList(),
+//                            label = emptyList(),
+//                            definition = emptyList()
                         )
                         title = currentWord.uid
                     }
@@ -140,6 +141,7 @@ fun TrilbyApp(
                 navController.navigate(route)
                 viewModel.isWordExist(word)
             },
+            onNavigateToLogin = onNavigateToLogin,
         )
     }
 }
@@ -151,12 +153,12 @@ fun formatRoute(route: String): Route? {
         route.endsWith("Route.Favorites") -> Route.Favorites
         route.endsWith("Route.Practice") -> Route.Practice
         route.endsWith("Route.Profile") -> Route.Profile
-        route.endsWith("Route.WordDetail/{uid}?wordId={wordId}&headword={headword}&label={label}&definition={definition}") -> Route.WordDetail(
+        route.endsWith("Route.WordDetail/{uid}") -> Route.WordDetail(
             uid = "",
-            wordId = emptyList(),
-            headword = emptyList(),
-            label = emptyList(),
-            definition = emptyList()
+//            wordId = emptyList(),
+//            headword = emptyList(),
+//            label = emptyList(),
+//            definition = emptyList()
         )
 //        route.endsWith("Route.WordDetail/{id}/{headword}/{label}?definition={definition}") -> Route.WordDetail(
 //            uid = "",
@@ -175,6 +177,8 @@ fun formatRoute(route: String): Route? {
 @Composable
 private fun TrilbyAppPreview() {
     TrilbyTheme {
-        TrilbyApp()
+        TrilbyApp(
+            onNavigateToLogin = {}
+        )
     }
 }

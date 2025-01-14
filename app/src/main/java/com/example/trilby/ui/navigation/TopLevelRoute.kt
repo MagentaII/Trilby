@@ -21,6 +21,9 @@ sealed class Route {
     data object Register: Route()
 
     @Serializable
+    data object Splash: Route()
+
+    @Serializable
     data object InApp: Route()
 
     @Serializable
@@ -38,10 +41,10 @@ sealed class Route {
     @Serializable
     data class WordDetail(
         val uid: String,
-        val wordId: List<String>,
-        val headword: List<String>,
-        val label: List<String>,
-        val definition: List<String>,
+//        val wordId: List<String>,
+//        val headword: List<String>,
+//        val label: List<String>,
+//        val definition: List<String>,
     ) : Route()
 }
 

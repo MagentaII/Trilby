@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.trilby.data.repositories.ShowWord
-import com.example.trilby.data.repositories.WordRepository
+import com.example.trilby.data.repositories.word_repository.ShowWord
+import com.example.trilby.data.repositories.word_repository.WordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -2,8 +2,8 @@ package com.example.trilby.ui.screens.favorites
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.trilby.data.repositories.ShowWord
-import com.example.trilby.data.repositories.WordRepository
+import com.example.trilby.data.repositories.word_repository.ShowWord
+import com.example.trilby.data.repositories.word_repository.WordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

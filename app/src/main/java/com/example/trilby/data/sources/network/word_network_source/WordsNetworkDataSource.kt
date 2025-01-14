@@ -1,4 +1,4 @@
-package com.example.trilby.data.sources.network
+package com.example.trilby.data.sources.network.word_network_source
 
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -12,6 +12,6 @@ interface DictionaryApiService {
     @GET("api/v3/references/collegiate/json/{word}")
     suspend fun searchWords(
         @Path("word") word: String,
-        @Query("key") apiKey: String = YOUR_API_KEY,
+        @Query("key") apiKey: String = YOUR_API_KEY
     ): List<NetworkWord>
 }

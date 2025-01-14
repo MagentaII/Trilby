@@ -1,8 +1,9 @@
-package com.example.trilby.data.repositories
+package com.example.trilby.data.repositories.word_repository
 
 import android.util.Log
+import com.example.trilby.BuildConfig
 import com.example.trilby.data.sources.local.WordDao
-import com.example.trilby.data.sources.network.DictionaryApiService
+import com.example.trilby.data.sources.network.word_network_source.DictionaryApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -30,22 +31,25 @@ class WordRepositoryImpl @Inject constructor(
         val networkWords = try {
             Log.i("TAG", "search: ")
             withContext(Dispatchers.IO) {
+                Log.i("TAG", "search, api key: ${BuildConfig.API_KEY}")
                 dictionaryApiService.searchWords(word = query)
             }
         } catch (e: Exception) {
             Log.d("TAG", "search: $e")
             emptyList()
         }
-        Log.i("TAG", "search, words: $networkWords")
+        networkWords.forEachIndexed { index, networkWord ->
+            Log.i("TAG", "search, definitions${index}: ${networkWord.def}")
+            networkWord.def.forEach { de ->
+                Log.i("TAG", "search, definition, de.sseq: ${de.sseq}: ")
+            }
+        }
         searchWords = networkWords.toExternal()
             .groupBy { word -> word.wordId.substringBefore(":") }
             .map { (uid, words) ->
                 ShowWord(
                     uid = uid,
-                    wordId = words.map { word -> word.wordId },
-                    headword = words.map { word -> word.headword },
-                    label = words.map { word -> word.label },
-                    definition = words.map { word -> word.definition },
+                    words = words
                 )
             }
         return networkWords.toExternal()
@@ -53,25 +57,20 @@ class WordRepositoryImpl @Inject constructor(
             .map { (uid, words) ->
                 ShowWord(
                     uid = uid,
-                    wordId = words.map { word -> word.wordId },
-                    headword = words.map { word -> word.headword },
-                    label = words.map { word -> word.label },
-                    definition = words.map { word -> word.definition },
+                    words = words
                 )
             }
-//        return networkWords.toExternal()
-//        return searchWords
     }
 
     // Local
     override suspend fun saveWord(word: ShowWord) {
-        val words: List<Word> = List(word.wordId.size) { index ->
+        val words: List<Word> = List(word.words.size) { index ->
             Word(
-                uid = word.uid,
-                wordId = word.wordId[index],
-                headword = word.headword[index],
-                label = word.label[index],
-                definition = word.definition[index],
+                wordId = word.words[index].wordId,
+                headword = word.words[index].headword,
+                wordPrs = word.words[index].wordPrs,
+                label = word.words[index].label,
+                shortDef =  word.words[index].shortDef,
             )
         }
         try {
@@ -92,29 +91,24 @@ class WordRepositoryImpl @Inject constructor(
             Log.d("TAG", "getAllWords: $e")
             emptyList()
         }
-//        favoriteWords = localWords.toExternal()
         return localWords.toExternal()
             .groupBy { word -> word.wordId.substringBefore(":") }
             .map { (uid, words) ->
                 ShowWord(
                     uid = uid,
-                    wordId = words.map { word -> word.wordId },
-                    headword = words.map { word -> word.headword },
-                    label = words.map { word -> word.label },
-                    definition = words.map { word -> word.definition },
+                    words = words
                 )
             }
-//        return words
     }
 
     override suspend fun deleteWord(word: ShowWord) {
-        val words: List<Word> = List(word.wordId.size) { index ->
+        val words: List<Word> = List(word.words.size) { index ->
             Word(
-                uid = word.uid,
-                wordId = word.wordId[index],
-                headword = word.headword[index],
-                label = word.label[index],
-                definition = word.definition[index],
+                wordId = word.words[index].wordId,
+                headword = word.words[index].headword,
+                wordPrs = word.words[index].wordPrs,
+                label = word.words[index].label,
+                shortDef =  word.words[index].shortDef,
             )
         }
         try {
@@ -127,13 +121,13 @@ class WordRepositoryImpl @Inject constructor(
     }
 
     override suspend fun isWordExist(word: ShowWord): Boolean {
-        val words: List<Word> = List(word.wordId.size) { index ->
+        val words: List<Word> = List(word.words.size) { index ->
             Word(
-                uid = word.uid,
-                wordId = word.wordId[index],
-                headword = word.headword[index],
-                label = word.label[index],
-                definition = word.definition[index],
+                wordId = word.words[index].wordId,
+                headword = word.words[index].headword,
+                wordPrs = word.words[index].wordPrs,
+                label = word.words[index].label,
+                shortDef =  word.words[index].shortDef,
             )
         }
         val isExist = try {

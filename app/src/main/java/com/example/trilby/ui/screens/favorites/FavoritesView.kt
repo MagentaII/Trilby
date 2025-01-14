@@ -11,13 +11,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.trilby.data.repositories.ShowWord
+import com.example.trilby.data.repositories.word_repository.ShowWord
 import com.example.trilby.ui.navigation.Route
+import com.example.trilby.ui.navigation.SharedViewModel
 import com.example.trilby.ui.util.WordCard
 
 @Composable
 fun FavoritesView(
     viewModel: FavoritesViewModel = hiltViewModel(),
+    sharedViewModel: SharedViewModel,
     onNavigateToDetail: (route: Route, word: ShowWord) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -26,6 +28,12 @@ fun FavoritesView(
     LaunchedEffect(Unit) {
         viewModel.getAllSaveWords()
     }
+
+    LaunchedEffect(words) {
+        Log.i("TAG", "FavoritesView, words change: $words")
+        sharedViewModel.updateWords(words)
+    }
+
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -41,7 +49,8 @@ fun FavoritesView(
 private fun FavoritesPreview() {
     FavoritesView(
         onNavigateToDetail = { route, word ->
-            Log.i("TAG", "FavoritesPreview, route, name: $route and ${word.headword}")
-        }
+            Log.i("TAG", "FavoritesPreview, route, name: $route and ${word.uid}")
+        },
+        sharedViewModel = hiltViewModel()
     )
 }

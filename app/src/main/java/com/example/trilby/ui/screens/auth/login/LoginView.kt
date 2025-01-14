@@ -1,4 +1,4 @@
-package com.example.trilby.ui.screens.login
+package com.example.trilby.ui.screens.auth.login
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -22,10 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -36,16 +32,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.trilby.R
 import com.example.trilby.ui.navigation.Route
 
 @Composable
 fun LoginView(
+    viewModel: LoginViewModel = hiltViewModel(),
     onNavigateToRegister: (route: Route) -> Unit,
+    onSignInNavigate: (route: Route) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+
     Surface(
         modifier = modifier.fillMaxSize(),
         color = Color(0xFF7988A9)
@@ -76,8 +74,10 @@ fun LoginView(
             )
             Spacer(Modifier.height(32.dp))
             TextField(
-                value = username,
-                onValueChange = { username = it },
+                value = viewModel.email,
+                onValueChange = { newEmail ->
+                    viewModel.updateEmail(newEmail)
+                },
                 label = {
                     Text(
                         text = "Email",
@@ -105,8 +105,10 @@ fun LoginView(
             )
             Spacer(Modifier.height(32.dp))
             TextField(
-                value = password,
-                onValueChange = { password = it },
+                value = viewModel.password,
+                onValueChange = { newPassword ->
+                    viewModel.updatePassword(newPassword)
+                },
                 label = {
                     Text(
                         text = "Password",
@@ -134,7 +136,9 @@ fun LoginView(
             )
             Spacer(Modifier.height(32.dp))
             ElevatedButton(
-                onClick = {},
+                onClick = {
+                    viewModel.onSignInClick(onSignInNavigate)
+                },
                 colors = ButtonDefaults.elevatedButtonColors().copy(
                     containerColor = Color(0xFFA8A4BB),
                     contentColor = Color.White,
@@ -206,6 +210,7 @@ fun LoginView(
                 }
             }
         }
+
     }
 }
 
@@ -232,6 +237,7 @@ fun SocialIconBox(iconResId: Int) {
 @Composable
 private fun LoginViewPreview() {
     LoginView(
-        onNavigateToRegister = {}
+        onNavigateToRegister = {},
+        onSignInNavigate = {},
     )
 }
