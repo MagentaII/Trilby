@@ -10,31 +10,21 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 data class DictionaryUiState(
-    val words: List<ShowWord> = emptyList()
+    val words: List<ShowWord> = emptyList(),
 )
 
 @HiltViewModel
 class DictionaryViewModel @Inject constructor(
-//    private val repository: WordRepository
 ) : ViewModel() {
     // state
     private val _uiState = MutableStateFlow(DictionaryUiState())
     val uiState: StateFlow<DictionaryUiState> = _uiState.asStateFlow()
 
     fun changeWords(words: List<ShowWord>) {
-//        val words = repository.searchWords;
         _uiState.update { currentState ->
             currentState.copy(
-                words = words
+                words = words,
             )
         }
     }
-
-//    fun changeWords(words: List<Word>) {
-//        _uiState.update { currentState ->
-//            currentState.copy(
-//                words = words
-//            )
-//        }
-//    }
 }

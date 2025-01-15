@@ -36,6 +36,7 @@ fun TrilbyNavHost(
         composable<Route.Dictionary> {
             DictionaryView(
                 words = trilbyAppUiState.words,
+                isLoading =  trilbyAppUiState.isLoading,
                 onNavigateToDetail = onNavigateToDetail,
                 sharedViewModel = sharedViewModel,
             )

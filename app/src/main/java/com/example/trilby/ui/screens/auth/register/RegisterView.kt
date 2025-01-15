@@ -167,7 +167,7 @@ fun RegisterView(
             Spacer(Modifier.height(32.dp))
             ElevatedButton(
                 onClick = {
-                    viewModel.onSignUpClick(onNavigate);
+                    viewModel.onSignUpClick(onNavigate)
                 },
                 colors = ButtonDefaults.elevatedButtonColors().copy(
                     containerColor = Color(0xFFA8A4BB),

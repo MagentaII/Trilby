@@ -17,7 +17,7 @@ class WordDetailViewModel @Inject constructor(
     fun playWordAudio(wordPrs: WordPrs) {
         val wordAudioUrl =
             "https://media.merriam-webster.com/audio/prons/en/us/mp3/${wordPrs.sound?.subdirectory}/${wordPrs.sound?.audio}.mp3"
-        Log.i("TAG", "playWordAudio, wordAudioUrl: ${wordAudioUrl.toString()}")
+        Log.i("TAG", "playWordAudio, wordAudioUrl: $wordAudioUrl")
         val mediaItem = MediaItem.fromUri(wordAudioUrl)
         exoPlayer.setMediaItem(mediaItem)
         exoPlayer.prepare()

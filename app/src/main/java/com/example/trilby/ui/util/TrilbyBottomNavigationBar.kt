@@ -88,7 +88,6 @@ private fun TrilbyBottomNavigationBarPreview() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     TrilbyBottomNavigationBar(
-//        navController = navController,
         currentDestination = currentDestination,
         onNavigation = { route->
             Log.i("TAG", "route: $route")

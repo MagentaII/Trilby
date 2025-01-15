@@ -18,6 +18,7 @@ import javax.inject.Inject
 data class TrilbyAppUiState(
     val words: List<ShowWord> = emptyList(),
     val isFavorite: Boolean = false,
+    val isLoading: Boolean = false,
 )
 
 @HiltViewModel
@@ -36,11 +37,17 @@ class TrilbyAppViewModel @Inject constructor(
 
     fun search(searchQuery: String) {
         viewModelScope.launch {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    isLoading = true
+                )
+            }
             val words = repository.search(searchQuery)
             repository.search(searchQuery)
             _uiState.update { currentState ->
                 currentState.copy(
-                    words = words
+                    words = words,
+                    isLoading = false
                 )
             }
         }

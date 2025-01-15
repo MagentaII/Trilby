@@ -55,7 +55,7 @@ fun WordDetailView(
             .padding(horizontal = 8.dp, vertical = 28.dp)
     ) {
         // Header Section
-        Log.i("TAG", "WordDetailView, headwords: ${selectedWord}")
+        Log.i("TAG", "WordDetailView, headwords: $selectedWord")
         HeaderSection(
             word = selectedWord?.uid ?: "Error"
         )
@@ -69,7 +69,7 @@ fun WordDetailView(
             color = Color(0xFFC3CFEA)
         )
 
-        selectedWord?.words?.forEachIndexed { index, word ->
+        selectedWord?.words?.forEach { word ->
             Spacer(Modifier.height(14.dp))
             // Word Details Section
             WordDetailsSection(

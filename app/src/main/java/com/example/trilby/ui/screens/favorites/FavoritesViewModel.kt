@@ -13,7 +13,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class FavoritesUiState(
-    val savedWords: List<ShowWord> = emptyList()
+    val savedWords: List<ShowWord> = emptyList(),
+    val isLoading: Boolean = false,
 )
 
 @HiltViewModel
@@ -26,21 +27,18 @@ class FavoritesViewModel @Inject constructor(
 
     fun getAllSaveWords() {
         viewModelScope.launch {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    isLoading = true,
+                )
+            }
             val words = repository.getAllWords()
             _uiState.update { currentState ->
                 currentState.copy(
-                    savedWords = words
+                    savedWords = words,
+                    isLoading = false,
                 )
             }
         }
     }
-
-//    fun changeSavedWords() {
-//        val words = repository.getWords();
-//        _uiState.update { currentState ->
-//            currentState.copy(
-//                savedWords = words
-//            )
-//        }
-//    }
 }
