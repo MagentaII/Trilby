@@ -131,6 +131,6 @@ private fun handleButtonClick(
 @Composable
 private fun ProfileViewPreview() {
     ProfileView(
-        onNavigateToLogin = {}
+        onNavigateToLogin = {},
     )
 }

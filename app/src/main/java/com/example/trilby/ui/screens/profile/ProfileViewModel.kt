@@ -17,12 +17,12 @@ data class ProfileUiState(
 )
 
 @HiltViewModel
-class ProfileViewModel @Inject constructor(
+open class ProfileViewModel @Inject constructor(
     private val repository: AuthRepository,
 ) : ViewModel() {
     // state
     private val _uiState = MutableStateFlow(ProfileUiState())
-    val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
+    open val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
     init {
         observeCurrentUser()
@@ -40,7 +40,7 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun signOut() {
+    open fun signOut() {
         viewModelScope.launch {
             repository.signOut()
         }

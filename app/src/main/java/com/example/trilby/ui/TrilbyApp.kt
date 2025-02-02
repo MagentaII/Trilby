@@ -99,7 +99,10 @@ fun TrilbyApp(
                 is Route.WordDetail -> DetailTopAppBar(
                     title = title,
                     onPopBack = { navController.popBackStack() },
-                    saveWord = { viewModel.saveWord(word = currentWord) },
+                    saveWord = {
+                        viewModel.saveWord(word = currentWord)
+//                        viewModel.addFirestoreWords(word = currentWord)
+                    },
                     deleteWord = { viewModel.deleteWord(word = currentWord) },
                     isSaveWord = trilbyAppUiState.isFavorite,
                 )

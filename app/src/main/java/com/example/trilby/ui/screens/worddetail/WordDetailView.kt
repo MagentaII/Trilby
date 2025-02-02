@@ -245,6 +245,7 @@ private fun WordDetailViewPreview() {
                         "a set of written, printed, or blank sheets bound together between a front and back cover",
                         "a long written or printed literary composition"
                     ),
+                    wordUuid = "836e81f2-f89e-40b8-b67c-e664c4c17a54"
                 )
             )
         )

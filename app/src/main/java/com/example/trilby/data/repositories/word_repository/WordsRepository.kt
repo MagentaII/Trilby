@@ -3,7 +3,8 @@ package com.example.trilby.data.repositories.word_repository
 import android.util.Log
 import com.example.trilby.BuildConfig
 import com.example.trilby.data.sources.local.WordDao
-import com.example.trilby.data.sources.network.word_network_source.DictionaryApiService
+import com.example.trilby.data.sources.network.word_api_network_source.DictionaryApiService
+import com.example.trilby.data.sources.network.word_firestore_network_source.WordsFirestoreService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -18,11 +19,16 @@ interface WordRepository {
     suspend fun getAllWords(): List<ShowWord>
     suspend fun deleteWord(word: ShowWord)
     suspend fun isWordExist(word: ShowWord): Boolean
+
+    // firestore
+    suspend fun getFirestoreWords(): List<ShowWord>
+    suspend fun addFirestoreWords(showWord: ShowWord)
 }
 
 class WordRepositoryImpl @Inject constructor(
     private val dictionaryApiService: DictionaryApiService,
     private val wordDao: WordDao,
+    private val wordsFirestoreService: WordsFirestoreService,
 ) : WordRepository {
 
     // Network
@@ -67,10 +73,11 @@ class WordRepositoryImpl @Inject constructor(
         val words: List<Word> = List(word.words.size) { index ->
             Word(
                 wordId = word.words[index].wordId,
+                wordUuid = word.words[index].wordUuid,
                 headword = word.words[index].headword,
                 wordPrs = word.words[index].wordPrs,
                 label = word.words[index].label,
-                shortDef =  word.words[index].shortDef,
+                shortDef = word.words[index].shortDef,
             )
         }
         try {
@@ -105,10 +112,11 @@ class WordRepositoryImpl @Inject constructor(
         val words: List<Word> = List(word.words.size) { index ->
             Word(
                 wordId = word.words[index].wordId,
+                wordUuid = word.words[index].wordUuid,
                 headword = word.words[index].headword,
                 wordPrs = word.words[index].wordPrs,
                 label = word.words[index].label,
-                shortDef =  word.words[index].shortDef,
+                shortDef = word.words[index].shortDef,
             )
         }
         try {
@@ -124,10 +132,11 @@ class WordRepositoryImpl @Inject constructor(
         val words: List<Word> = List(word.words.size) { index ->
             Word(
                 wordId = word.words[index].wordId,
+                wordUuid = word.words[index].wordUuid,
                 headword = word.words[index].headword,
                 wordPrs = word.words[index].wordPrs,
                 label = word.words[index].label,
-                shortDef =  word.words[index].shortDef,
+                shortDef = word.words[index].shortDef,
             )
         }
         val isExist = try {
@@ -139,5 +148,37 @@ class WordRepositoryImpl @Inject constructor(
             false
         }
         return isExist
+    }
+
+    override suspend fun getFirestoreWords(): List<ShowWord> {
+        return try {
+            withContext(Dispatchers.IO) {
+                wordsFirestoreService.getWord().toExternal()
+                    .groupBy { word -> word.wordId.substringBefore(":") }
+                    .map { (uid, words) ->
+                        ShowWord(
+                            uid = uid,
+                            words = words
+                        )
+                    }
+            }
+        } catch (e: Exception) {
+            Log.d("repository", "getFirestoreWord: $e")
+            emptyList()
+        }
+    }
+
+    override suspend fun addFirestoreWords(showWord: ShowWord) {
+        val firestoreWords = showWord.words.map { word ->
+            word.toFirestore()
+        }
+        try {
+            withContext(Dispatchers.IO) {
+                wordsFirestoreService.addWord(firestoreWords)
+            }
+        } catch (e: Exception) {
+            Log.d("repository", "addFirestoreWords: $e")
+        }
+
     }
 }

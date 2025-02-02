@@ -15,6 +15,7 @@ data class ShowWord(
 
 data class Word(
     val wordId: String,
+    val wordUuid: String,
     val headword: String,
     val wordPrs: List<WordPrs>?,
     val label: String,
@@ -23,6 +24,7 @@ data class Word(
     companion object {
         val empty = Word(
             wordId = "",
+            wordUuid = "",
             headword = "",
             wordPrs = null,
             label = "",

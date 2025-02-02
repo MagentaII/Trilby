@@ -31,6 +31,7 @@ fun FavoritesView(
     val isLoading = favoritesUiState.isLoading
     LaunchedEffect(Unit) {
         viewModel.getAllSaveWords()
+//        viewModel.getFirestoreWord()
     }
 
     LaunchedEffect(words) {

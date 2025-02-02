@@ -77,4 +77,10 @@ class TrilbyAppViewModel @Inject constructor(
             }
         }
     }
+
+    fun addFirestoreWords(word: ShowWord) {
+        viewModelScope.launch {
+            repository.addFirestoreWords(showWord = word)
+        }
+    }
 }

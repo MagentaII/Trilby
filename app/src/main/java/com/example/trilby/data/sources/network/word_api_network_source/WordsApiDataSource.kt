@@ -1,4 +1,4 @@
-package com.example.trilby.data.sources.network.word_network_source
+package com.example.trilby.data.sources.network.word_api_network_source
 
 import retrofit2.http.GET
 import retrofit2.http.Path

@@ -1,5 +1,6 @@
 package com.example.trilby.ui.screens.favorites
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trilby.data.repositories.word_repository.ShowWord
@@ -36,6 +37,24 @@ class FavoritesViewModel @Inject constructor(
             _uiState.update { currentState ->
                 currentState.copy(
                     savedWords = words,
+                    isLoading = false,
+                )
+            }
+        }
+    }
+
+    fun getFirestoreWord() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                isLoading = true,
+            )
+        }
+        viewModelScope.launch {
+            val showWords = repository.getFirestoreWords()
+            Log.d("FavoritesViewModel", "getFirestoreWord, showWords: $showWords")
+            _uiState.update { currentState ->
+                currentState.copy(
+                    savedWords = showWords,
                     isLoading = false,
                 )
             }
