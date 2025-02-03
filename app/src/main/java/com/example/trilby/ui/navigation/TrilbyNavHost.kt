@@ -23,7 +23,7 @@ fun TrilbyNavHost(
     trilbyAppUiState: TrilbyAppUiState,
     navController: NavHostController,
     onNavigateToDetail: (route: Route, word: ShowWord) -> Unit,
-    onNavigateToLogin: (route: Route) -> Unit,
+    onNavigate: (route: Route) -> Unit,
     sharedViewModel: SharedViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
 ) {
@@ -50,7 +50,7 @@ fun TrilbyNavHost(
         composable<Route.Practice> { PracticeView() }
         composable<Route.Profile> {
             ProfileView(
-                onNavigateToLogin = onNavigateToLogin
+                onNavigate = onNavigate
             )
         }
         composable<Route.WordDetail> { backStateEntry ->

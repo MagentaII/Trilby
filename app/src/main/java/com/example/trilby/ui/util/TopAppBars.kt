@@ -1,7 +1,10 @@
 package com.example.trilby.ui.util
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -15,15 +18,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.trilby.R
 import com.example.trilby.ui.TrilbyAppViewModel
 import com.example.trilby.ui.theme.TrilbyTheme
 
@@ -61,6 +70,53 @@ fun DefaultTopAppBar(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AuthTopAppBar(
+    onCancelClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
+    Column(
+        modifier = modifier
+            .background(Color(0xFF3C4A68))
+            .padding(top = 32.dp, start = 16.dp, end = 16.dp)
+    ) {
+        CenterAlignedTopAppBar(
+            title = {
+                Box(
+                    contentAlignment = Alignment.BottomCenter, // 讓圖片貼齊底部
+                    modifier = Modifier
+                        .size(width = 140.dp, height = 37.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.trilby_image),
+                        contentDescription = "trilby_image",
+                    )
+                }
+            },
+            navigationIcon = {
+                TextButton(
+                    onClick = onCancelClick,
+                    modifier = Modifier.fillMaxHeight() // 讓按鈕填滿 TopAppBar 高度
+                ) {
+                    Text(
+                        text = "Cancel",
+                        color = Color.White,
+                        style = TextStyle(fontSize = 16.sp)
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = Color(0xFF3C4A68),
+                titleContentColor = Color.White,
+            ),
+            scrollBehavior = scrollBehavior,
+            modifier = modifier.fillMaxWidth()
+        )
+    }
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddSearchBarTopAppBar(
@@ -185,6 +241,18 @@ private fun DefaultTopAppBarPreview() {
     TrilbyTheme {
         Surface {
             DefaultTopAppBar(title = "Favorites")
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun AuthTopAppBarPreview() {
+    TrilbyTheme {
+        Surface {
+            AuthTopAppBar(
+                onCancelClick = {}
+            )
         }
     }
 }

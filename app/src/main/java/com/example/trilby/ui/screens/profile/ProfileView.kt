@@ -29,7 +29,7 @@ import com.example.trilby.ui.navigation.Route
 
 @Composable
 fun ProfileView(
-    onNavigateToLogin: (route: Route) -> Unit,
+    onNavigate: (route: Route) -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
@@ -48,8 +48,25 @@ fun ProfileView(
             SignInAndOutButton(
                 viewModel = viewModel,
                 hasUser = profileUiState.currentUser != null,
-                onNavigateToLogin = onNavigateToLogin
+                onNavigate = onNavigate
             )
+            ElevatedButton(
+                onClick = {
+                    onNavigate(Route.Register)
+                },
+                colors = ButtonDefaults.elevatedButtonColors(
+                    containerColor = Color(0xFFA8A4BB),
+                    contentColor = Color.White,
+                ),
+                border = BorderStroke(2.dp, Color.White),
+                elevation = ButtonDefaults.elevatedButtonElevation(defaultElevation = 4.dp),
+                modifier = Modifier.size(width = 200.dp, height = 64.dp),
+            ) {
+                Text(
+                    text = "Sign up",
+                    style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                )
+            }
         }
     }
 }
@@ -58,7 +75,7 @@ fun ProfileView(
 fun SignInAndOutButton(
     viewModel: ProfileViewModel,
     hasUser: Boolean,
-    onNavigateToLogin: (route: Route) -> Unit,
+    onNavigate: (route: Route) -> Unit,
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
@@ -96,7 +113,7 @@ fun SignInAndOutButton(
         onClick = {
             handleButtonClick(
                 hasUser = hasUser,
-                onNavigateToLogin = onNavigateToLogin,
+                onNavigate = onNavigate,
                 showSignOutDialog = { showDialog = true }
             )
         },
@@ -117,13 +134,13 @@ fun SignInAndOutButton(
 
 private fun handleButtonClick(
     hasUser: Boolean,
-    onNavigateToLogin: (route: Route) -> Unit,
+    onNavigate: (route: Route) -> Unit,
     showSignOutDialog: () -> Unit
 ) {
     if (hasUser) {
         showSignOutDialog()
     } else {
-        onNavigateToLogin(Route.Login)
+        onNavigate(Route.Login)
     }
 }
 
@@ -131,6 +148,6 @@ private fun handleButtonClick(
 @Composable
 private fun ProfileViewPreview() {
     ProfileView(
-        onNavigateToLogin = {},
+        onNavigate = {},
     )
 }
