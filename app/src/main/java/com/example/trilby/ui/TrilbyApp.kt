@@ -27,7 +27,7 @@ import com.example.trilby.ui.util.TrilbyBottomNavigationBar
 
 @Composable
 fun TrilbyApp(
-    onNavigateToLogin: (route: Route) -> Unit,
+    onNavigate: (route: Route) -> Unit,
     viewModel: TrilbyAppViewModel = hiltViewModel(),
 ) {
     // Navigation
@@ -144,7 +144,7 @@ fun TrilbyApp(
                 navController.navigate(route)
                 viewModel.isWordExist(word)
             },
-            onNavigateToLogin = onNavigateToLogin,
+            onNavigate = onNavigate,
         )
     }
 }
@@ -181,7 +181,7 @@ fun formatRoute(route: String): Route? {
 private fun TrilbyAppPreview() {
     TrilbyTheme {
         TrilbyApp(
-            onNavigateToLogin = {}
+            onNavigate = {}
         )
     }
 }

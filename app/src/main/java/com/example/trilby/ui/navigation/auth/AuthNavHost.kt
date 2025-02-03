@@ -22,8 +22,8 @@ fun AuthNavHost(
     ) {
         composable<Route.Login> {
             LoginView(
-                onNavigateToRegister = { route ->
-                    navController.navigate(route)
+                onNavigateBack = {
+                    navController.popBackStack()
                 },
                 onSignInNavigate = { route ->
                     navController.navigate(route)
@@ -32,10 +32,10 @@ fun AuthNavHost(
         }
         composable<Route.Register> {
             RegisterView(
-                onNavigateToLogin = { route ->
-                    navController.navigate(route)
+                onNavigateBack = {
+                    navController.popBackStack()
                 },
-                onNavigate = { route ->
+                onSignUpNavigate = { route ->
                     navController.navigate(route)
                 }
             )
@@ -49,7 +49,7 @@ fun AuthNavHost(
         navigation<Route.InApp>(startDestination = Route.Dictionary) {
             composable<Route.Dictionary> {
                 TrilbyApp(
-                    onNavigateToLogin = { route ->
+                    onNavigate = { route ->
                         navController.navigate(route = route)
                     }
                 )
