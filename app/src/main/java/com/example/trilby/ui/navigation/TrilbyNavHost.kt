@@ -25,6 +25,8 @@ fun TrilbyNavHost(
     onNavigateToDetail: (route: Route, word: ShowWord) -> Unit,
     onNavigate: (route: Route) -> Unit,
     sharedViewModel: SharedViewModel = hiltViewModel(),
+    showBottomSheet: Boolean,
+    onDismissBottomSheet: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -50,6 +52,8 @@ fun TrilbyNavHost(
         composable<Route.Practice> { PracticeView() }
         composable<Route.Profile> {
             ProfileView(
+                showBottomSheet = showBottomSheet,
+                onDismissBottomSheet = onDismissBottomSheet,
                 onNavigate = onNavigate
             )
         }

@@ -23,6 +23,7 @@ import com.example.trilby.ui.theme.TrilbyTheme
 import com.example.trilby.ui.util.AddSearchBarTopAppBar
 import com.example.trilby.ui.util.DefaultTopAppBar
 import com.example.trilby.ui.util.DetailTopAppBar
+import com.example.trilby.ui.util.ProfileTopAppBar
 import com.example.trilby.ui.util.TrilbyBottomNavigationBar
 
 @Composable
@@ -107,6 +108,11 @@ fun TrilbyApp(
                     isSaveWord = trilbyAppUiState.isFavorite,
                 )
 
+                is Route.Profile -> ProfileTopAppBar(
+                    showBottomSheet = {viewModel.showBottomSheet()},
+                    hasUser = trilbyAppUiState.currentUser != null,
+                )
+
                 else -> DefaultTopAppBar(
                     title = title,
                 )
@@ -145,6 +151,10 @@ fun TrilbyApp(
                 viewModel.isWordExist(word)
             },
             onNavigate = onNavigate,
+            showBottomSheet = trilbyAppUiState.showBottomSheet,
+            onDismissBottomSheet = {
+                viewModel.hideBottomSheet()
+            }
         )
     }
 }

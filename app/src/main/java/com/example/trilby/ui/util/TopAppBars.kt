@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -117,6 +118,46 @@ fun AuthTopAppBar(
         )
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProfileTopAppBar(
+    hasUser: Boolean,
+    showBottomSheet: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
+    Column(
+        modifier = modifier
+            .background(Color.Transparent)
+            .padding(top = 32.dp, start = 16.dp, end = 16.dp)
+    ) {
+        CenterAlignedTopAppBar(
+            title = { },
+            actions = {
+                if (hasUser) {
+                    IconButton(
+                        onClick = showBottomSheet
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.MoreVert,
+                            contentDescription = "More",
+                            tint = Color.Black
+                        )
+                    }
+                }
+            },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = Color.Transparent,
+                titleContentColor = Color.White,
+            ),
+            scrollBehavior = scrollBehavior,
+            modifier = modifier.fillMaxWidth()
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddSearchBarTopAppBar(
@@ -252,6 +293,19 @@ private fun AuthTopAppBarPreview() {
         Surface {
             AuthTopAppBar(
                 onCancelClick = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ProfileTopAppBarPreview() {
+    TrilbyTheme {
+        Surface {
+            ProfileTopAppBar(
+                showBottomSheet = {},
+                hasUser = true
             )
         }
     }
