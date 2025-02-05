@@ -1,4 +1,4 @@
-package com.example.trilby.ui.screens.worddetail
+package com.example.trilby.ui.screens.word_detail
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

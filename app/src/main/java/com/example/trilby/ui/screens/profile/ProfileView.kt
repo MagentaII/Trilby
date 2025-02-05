@@ -1,6 +1,5 @@
 package com.example.trilby.ui.screens.profile
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,14 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -108,7 +105,7 @@ fun ProfileView(
             .fillMaxSize()
             .padding(horizontal = 20.dp)
     ) {
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(16.dp))
 
         Text(
             text = "Trilby Friend",
@@ -118,7 +115,7 @@ fun ProfileView(
             )
         )
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(8.dp))
 
         Text(
             text = profileUiState.currentUser?.email ?: "@trilby_friend123456",
@@ -128,7 +125,7 @@ fun ProfileView(
             ),
         )
 
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(24.dp))
 
         if (profileUiState.currentUser != null) {
             ProfileContentAfterSignIn()
@@ -436,123 +433,6 @@ fun ShowSignOutDialog(
             }
         }
     )
-}
-
-//@Composable
-//fun ProfileView(
-//    onNavigate: (route: Route) -> Unit,
-//    viewModel: ProfileViewModel = hiltViewModel(),
-//    modifier: Modifier = Modifier
-//) {
-//    val profileUiState by viewModel.uiState.collectAsState()
-//    Box(
-//        modifier = modifier.fillMaxSize(),
-//        contentAlignment = Alignment.Center
-//    ) {
-//        Column(
-//            horizontalAlignment = Alignment.CenterHorizontally
-//        ) {
-//            Text(
-//                text = profileUiState.currentUser?.email ?: "No user is signed in.",
-//                style = TextStyle(fontSize = 16.sp)
-//            )
-//            SignInAndOutButton(
-//                viewModel = viewModel,
-//                hasUser = profileUiState.currentUser != null,
-//                onNavigate = onNavigate
-//            )
-//            ElevatedButton(
-//                onClick = {
-//                    onNavigate(Route.Register)
-//                },
-//                colors = ButtonDefaults.elevatedButtonColors(
-//                    containerColor = Color(0xFFA8A4BB),
-//                    contentColor = Color.White,
-//                ),
-//                border = BorderStroke(2.dp, Color.White),
-//                elevation = ButtonDefaults.elevatedButtonElevation(defaultElevation = 4.dp),
-//                modifier = Modifier.size(width = 200.dp, height = 64.dp),
-//            ) {
-//                Text(
-//                    text = "Sign up",
-//                    style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold)
-//                )
-//            }
-//        }
-//    }
-//}
-
-@Composable
-fun SignInAndOutButton(
-    viewModel: ProfileViewModel,
-    hasUser: Boolean,
-    onNavigate: (route: Route) -> Unit,
-) {
-    var showDialog by remember { mutableStateOf(false) }
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = {
-                Text(
-                    text = "Confirm Sign Out",
-                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                )
-            },
-            text = {
-                Text("Are you sure you want to sign out?")
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.signOut()
-                        showDialog = false
-                    }
-                ) {
-                    Text("Sign out", color = Color.Red)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDialog = false }) {
-                    Text("Cancel")
-                }
-            }
-        )
-    }
-
-    ElevatedButton(
-        onClick = {
-            handleButtonClick(
-                hasUser = hasUser,
-                onNavigate = onNavigate,
-                showSignOutDialog = { showDialog = true }
-            )
-        },
-        colors = ButtonDefaults.elevatedButtonColors(
-            containerColor = Color(0xFFA8A4BB),
-            contentColor = Color.White,
-        ),
-        border = BorderStroke(2.dp, Color.White),
-        elevation = ButtonDefaults.elevatedButtonElevation(defaultElevation = 4.dp),
-        modifier = Modifier.size(width = 200.dp, height = 64.dp),
-    ) {
-        Text(
-            text = if (hasUser) "Sign out" else "Sign in",
-            style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold)
-        )
-    }
-}
-
-private fun handleButtonClick(
-    hasUser: Boolean,
-    onNavigate: (route: Route) -> Unit,
-    showSignOutDialog: () -> Unit
-) {
-    if (hasUser) {
-        showSignOutDialog()
-    } else {
-        onNavigate(Route.Login)
-    }
 }
 
 @Preview(showBackground = true)

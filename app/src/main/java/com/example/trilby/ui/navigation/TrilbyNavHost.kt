@@ -16,7 +16,7 @@ import com.example.trilby.ui.screens.dictionary.DictionaryView
 import com.example.trilby.ui.screens.favorites.FavoritesView
 import com.example.trilby.ui.screens.practice.PracticeView
 import com.example.trilby.ui.screens.profile.ProfileView
-import com.example.trilby.ui.screens.worddetail.WordDetailView
+import com.example.trilby.ui.screens.word_detail.WordDetailView
 
 @Composable
 fun TrilbyNavHost(

@@ -4,8 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -17,6 +19,8 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -128,28 +133,122 @@ fun ProfileTopAppBar(
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
+    Box {
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFF7988A9))
+                    .padding(top = 32.dp)
+            ) {
+                LargeTopAppBar(
+                    title = { },
+                    actions = {
+                        if (hasUser) {
+                            IconButton(
+                                onClick = showBottomSheet,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.MoreVert,
+                                    contentDescription = "More",
+                                    tint = Color.White
+                                )
+                            }
+                        }
+                    },
+                    colors = TopAppBarDefaults.largeTopAppBarColors().copy(
+                        containerColor = Color(0xFF7988A9)
+                    ),
+                    scrollBehavior = scrollBehavior,
+                    modifier = modifier.fillMaxWidth()
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 16.dp)
+                    .height(50.dp)
+                    .background(Color(0xFFF7F9FF)),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                if (hasUser) {
+                    OutlinedButton(
+                        onClick = {},
+                        contentPadding = PaddingValues(horizontal = 20.dp)
+                    ) {
+                        Text(
+                            text = "Edit profile",
+                            color = Color.Black,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            }
+        }
+        Box(
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .size(100.dp)
+                .background(Color.Black)
+                .align(Alignment.BottomStart)
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditProfileTopAppBar(
+    onCancelClick: () -> Unit,
+    isDataChange: Boolean,
+    onSaveClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
     Column(
         modifier = modifier
-            .background(Color.Transparent)
+            .background(Color(0xFF3C4A68))
             .padding(top = 32.dp, start = 16.dp, end = 16.dp)
     ) {
         CenterAlignedTopAppBar(
-            title = { },
+            title = {
+                Text(
+                    text = "Edit profile",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp
+                )
+            },
+            navigationIcon = {
+                TextButton(
+                    onClick = onCancelClick,
+                    modifier = Modifier.fillMaxHeight() // 讓按鈕填滿 TopAppBar 高度
+                ) {
+                    Text(
+                        text = "Cancel",
+                        color = Color.White,
+                        style = TextStyle(fontSize = 16.sp)
+                    )
+                }
+            },
             actions = {
-                if (hasUser) {
-                    IconButton(
-                        onClick = showBottomSheet
+                if (isDataChange) {
+                    TextButton(
+                        onClick = onCancelClick,
+                        modifier = Modifier.fillMaxHeight() // 讓按鈕填滿 TopAppBar 高度
                     ) {
-                        Icon(
-                            imageVector = Icons.Outlined.MoreVert,
-                            contentDescription = "More",
-                            tint = Color.Black
+                        Text(
+                            text = "Save",
+                            color = Color.White,
+                            style = TextStyle(fontSize = 16.sp)
                         )
                     }
                 }
             },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = Color.Transparent,
+                containerColor = Color(0xFF3C4A68),
                 titleContentColor = Color.White,
             ),
             scrollBehavior = scrollBehavior,
@@ -309,6 +408,16 @@ private fun ProfileTopAppBarPreview() {
             )
         }
     }
+}
+
+@Preview
+@Composable
+private fun EditProfileAppBarPreview() {
+    EditProfileTopAppBar(
+        onCancelClick = {},
+        isDataChange = true,
+        onSaveClick = {},
+    )
 }
 
 @Preview
