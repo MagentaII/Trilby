@@ -39,7 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.trilby.R
-import com.example.trilby.ui.TrilbyAppViewModel
+import com.example.trilby.ui.navigation.Route
+import com.example.trilby.ui.screens.dictionary.DictionaryViewModel
 import com.example.trilby.ui.theme.TrilbyTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,7 +53,7 @@ fun DefaultTopAppBar(
     Column(
         modifier = modifier
             .background(Color(0xFF7988A9))
-            .padding(all = 16.dp)
+            .padding(top = 32.dp, start = 16.dp, end = 16.dp)
     ) {
         CenterAlignedTopAppBar(
             title = {
@@ -61,9 +62,6 @@ fun DefaultTopAppBar(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = Color.White,
-                    modifier = Modifier.padding(
-                        top = 16.dp,
-                    )
                 )
             },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -92,7 +90,7 @@ fun AuthTopAppBar(
         CenterAlignedTopAppBar(
             title = {
                 Box(
-                    contentAlignment = Alignment.BottomCenter, // 讓圖片貼齊底部
+                    contentAlignment = Alignment.BottomCenter,
                     modifier = Modifier
                         .size(width = 140.dp, height = 37.dp)
                 ) {
@@ -105,7 +103,7 @@ fun AuthTopAppBar(
             navigationIcon = {
                 TextButton(
                     onClick = onCancelClick,
-                    modifier = Modifier.fillMaxHeight() // 讓按鈕填滿 TopAppBar 高度
+                    modifier = Modifier.fillMaxHeight()
                 ) {
                     Text(
                         text = "Cancel",
@@ -129,6 +127,7 @@ fun AuthTopAppBar(
 fun ProfileTopAppBar(
     hasUser: Boolean,
     showBottomSheet: () -> Unit,
+    onNavigateToEditProfile: (route: Route) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -173,7 +172,9 @@ fun ProfileTopAppBar(
             ) {
                 if (hasUser) {
                     OutlinedButton(
-                        onClick = {},
+                        onClick = {
+                            onNavigateToEditProfile(Route.EditProfile)
+                        },
                         contentPadding = PaddingValues(horizontal = 20.dp)
                     ) {
                         Text(
@@ -224,7 +225,7 @@ fun EditProfileTopAppBar(
             navigationIcon = {
                 TextButton(
                     onClick = onCancelClick,
-                    modifier = Modifier.fillMaxHeight() // 讓按鈕填滿 TopAppBar 高度
+                    modifier = Modifier.fillMaxHeight()
                 ) {
                     Text(
                         text = "Cancel",
@@ -237,7 +238,7 @@ fun EditProfileTopAppBar(
                 if (isDataChange) {
                     TextButton(
                         onClick = onCancelClick,
-                        modifier = Modifier.fillMaxHeight() // 讓按鈕填滿 TopAppBar 高度
+                        modifier = Modifier.fillMaxHeight()
                     ) {
                         Text(
                             text = "Save",
@@ -260,7 +261,7 @@ fun EditProfileTopAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddSearchBarTopAppBar(
-    viewModel: TrilbyAppViewModel = hiltViewModel(),
+    viewModel: DictionaryViewModel = hiltViewModel(),
     title: String,
     modifier: Modifier = Modifier
 ) {
@@ -268,7 +269,7 @@ fun AddSearchBarTopAppBar(
     Column(
         modifier = modifier
             .background(Color(0xFF7988A9))
-            .padding(all = 16.dp)
+            .padding(top = 32.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
     ) {
         CenterAlignedTopAppBar(
             title = {
@@ -277,7 +278,6 @@ fun AddSearchBarTopAppBar(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = Color.White,
-                    modifier = Modifier.padding(top = 16.dp)
                 )
             },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -306,7 +306,7 @@ fun DetailTopAppBar(
     Column(
         modifier = modifier
             .background(Color(0xFF7988A9))
-            .padding(all = 16.dp)
+            .padding(top = 32.dp, start = 16.dp, end = 16.dp)
     ) {
         CenterAlignedTopAppBar(
             title = {
@@ -315,7 +315,6 @@ fun DetailTopAppBar(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = Color.White,
-                    modifier = Modifier.padding(top = 16.dp)
                 )
             },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -325,8 +324,6 @@ fun DetailTopAppBar(
             navigationIcon = {
                 IconButton(
                     onClick = { onPopBack() },
-                    modifier = Modifier
-                        .padding(top = 16.dp, end = 16.dp)
                 ) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
@@ -346,8 +343,6 @@ fun DetailTopAppBar(
                             saveWord()
                         }
                     },
-                    modifier = Modifier
-                        .padding(top = 16.dp, end = 16.dp)
                 ) {
                     if (isSaveWord) {
                         Icon(
@@ -404,6 +399,7 @@ private fun ProfileTopAppBarPreview() {
         Surface {
             ProfileTopAppBar(
                 showBottomSheet = {},
+                onNavigateToEditProfile = {},
                 hasUser = true
             )
         }

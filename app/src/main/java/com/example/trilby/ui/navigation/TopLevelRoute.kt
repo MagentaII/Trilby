@@ -14,14 +14,6 @@ import kotlinx.serialization.Serializable
 
 
 sealed class Route {
-    @Serializable
-    data object Login: Route()
-
-    @Serializable
-    data object Register: Route()
-
-    @Serializable
-    data object Splash: Route()
 
     @Serializable
     data object InApp: Route()
@@ -41,11 +33,19 @@ sealed class Route {
     @Serializable
     data class WordDetail(
         val uid: String,
-//        val wordId: List<String>,
-//        val headword: List<String>,
-//        val label: List<String>,
-//        val definition: List<String>,
     ) : Route()
+
+    @Serializable
+    data object Login: Route()
+
+    @Serializable
+    data object Register: Route()
+
+    @Serializable
+    data object EditProfile : Route()
+
+    @Serializable
+    data object Splash: Route()
 }
 
 data class TopLevelRoute(

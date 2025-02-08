@@ -12,12 +12,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Divider
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,23 +31,26 @@ import com.example.trilby.ui.util.EditProfileTopAppBar
 
 @Composable
 fun EditProfileView(
+    onCancelClick: () -> Unit,
+    onSaveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         topBar = {
             EditProfileTopAppBar(
-                onCancelClick = {},
+                onCancelClick = onCancelClick,
                 isDataChange = false,
-                onSaveClick = {}
+                onSaveClick = onSaveClick
             )
         },
-        contentColor = Color(0xDD7988A9)
+        contentColor = Color(0xFF8B9CBF),
+        containerColor = Color(0xFF8B9CBF)
     ) { innerPadding ->
         Surface(
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            color = Color(0xFF7988A9)
+            color = Color(0xFF8B9CBF)
         ) {
             Column {
                 Box {
@@ -62,7 +65,7 @@ fun EditProfileView(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(58.dp)
-                                .background(Color(0xFF7988A9))
+                                .background(Color(0xFF8B9CBF))
                         )
                     }
                     Box(
@@ -76,9 +79,9 @@ fun EditProfileView(
 
                 Spacer(Modifier.height(24.dp))
 
-                Divider(
-                    color = Color.White,
-                    thickness = 2.dp
+                HorizontalDivider(
+                    thickness = 2.dp,
+                    color = Color.White
                 )
                 Box(
                     modifier = Modifier
@@ -131,7 +134,7 @@ fun EditProfileView(
                         )
                     }
                 }
-                Divider(
+                HorizontalDivider(
                     color = Color.White,
                     thickness = 2.dp
                 )
@@ -186,7 +189,7 @@ fun EditProfileView(
                         )
                     }
                 }
-                Divider(
+                HorizontalDivider(
                     color = Color.White,
                     thickness = 2.dp
                 )
@@ -241,7 +244,7 @@ fun EditProfileView(
                         )
                     }
                 }
-                Divider(
+                HorizontalDivider(
                     color = Color.White,
                     thickness = 2.dp
                 )
@@ -296,7 +299,7 @@ fun EditProfileView(
                         )
                     }
                 }
-                Divider(
+                HorizontalDivider(
                     color = Color.White,
                     thickness = 2.dp
                 )
@@ -308,5 +311,8 @@ fun EditProfileView(
 @Preview
 @Composable
 private fun EditProfileViewPreview() {
-    EditProfileView()
+    EditProfileView(
+        onCancelClick = {},
+        onSaveClick = {}
+    )
 }

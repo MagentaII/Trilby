@@ -76,16 +76,20 @@ fun RegisterView(
                     Spacer(Modifier.height(24.dp))
 
                     // Email 輸入框
+                    CustomOutlinedTextField(viewModel = viewModel, label = "Name")
+                    Spacer(Modifier.height(24.dp))
+
+                    // Email 輸入框
                     CustomOutlinedTextField(viewModel = viewModel, label = "Email")
                     Spacer(Modifier.height(24.dp))
 
                     // Password 輸入框
                     CustomOutlinedTextField(viewModel = viewModel, label = "Password")
-                    Spacer(Modifier.height(32.dp))
+                    Spacer(Modifier.height(24.dp))
 
                     // Confirm password 輸入框
                     CustomOutlinedTextField(viewModel = viewModel, label = "Confirm password")
-                    Spacer(Modifier.height(32.dp))
+                    Spacer(Modifier.height(24.dp))
 
                     // 第三方登入區塊
                     Box(
@@ -152,12 +156,14 @@ fun CustomOutlinedTextField(
 ) {
     OutlinedTextField(
         value = when (label) {
+            "Name" -> viewModel.name
             "Email" -> viewModel.email
             "Password" -> viewModel.password
             else -> viewModel.confirmPassword
         },
         onValueChange = { newValue ->
             when (label) {
+                "Name" -> viewModel.updateName(newValue)
                 "Email" -> viewModel.updateEmail(newValue)
                 "Password" -> viewModel.updatePassword(newValue)
                 else -> viewModel.updateConfirmPassword(newValue)

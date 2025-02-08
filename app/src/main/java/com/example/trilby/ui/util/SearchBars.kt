@@ -36,11 +36,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.trilby.ui.TrilbyAppViewModel
+import com.example.trilby.ui.screens.dictionary.DictionaryViewModel
 
 @Composable
 fun TrilbySearchBar(
-    viewModel: TrilbyAppViewModel = hiltViewModel(),
+    viewModel: DictionaryViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
     Log.d("TAG", "TrilbySearchBar ViewModel: ${viewModel.hashCode()}")

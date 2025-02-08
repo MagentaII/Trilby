@@ -16,9 +16,11 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -41,31 +43,35 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.trilby.ui.navigation.Route
+import com.example.trilby.ui.util.ProfileTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileView(
     viewModel: ProfileViewModel = hiltViewModel(),
-    showBottomSheet: Boolean,
-    onDismissBottomSheet: () -> Unit,
-    onNavigate: (route: Route) -> Unit,
+    onNavigateToEditProfile: (route: Route) -> Unit,
+    onNavigateToLogin: (route: Route) -> Unit,
+    onNavigateToRegister: (route: Route) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val profileUiState by viewModel.uiState.collectAsState()
     val sheetState = rememberModalBottomSheetState()
     var showDialog by remember { mutableStateOf(false) }
+    val isLoading = profileUiState.isLoading
 
-    LaunchedEffect(showBottomSheet) {
-        if (showBottomSheet) {
+    LaunchedEffect(profileUiState.showBottomSheet) {
+        if (profileUiState.showBottomSheet) {
             sheetState.show()
         } else {
             sheetState.hide()
         }
     }
 
-    if (showBottomSheet) {
+    if (profileUiState.showBottomSheet) {
         ModalBottomSheet(
-            onDismissRequest = { onDismissBottomSheet() },
+            onDismissRequest = {
+                viewModel.hideBottomSheet()
+            },
             sheetState = sheetState,
             containerColor = Color(0xFF3A5069),
             contentColor = Color.White,
@@ -92,7 +98,7 @@ fun ProfileView(
             onClickSignOut = {
                 viewModel.signOut()
                 showDialog = false
-                onDismissBottomSheet()
+                viewModel.hideBottomSheet()
             },
             onDismissDialog = {
                 showDialog = false
@@ -100,39 +106,62 @@ fun ProfileView(
         )
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp)
-    ) {
-        Spacer(Modifier.height(16.dp))
-
-        Text(
-            text = "Trilby Friend",
-            style = TextStyle(
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Black
+    Scaffold(
+        topBar = {
+            ProfileTopAppBar(
+                showBottomSheet = { viewModel.showBottomSheet() },
+                onNavigateToEditProfile = onNavigateToEditProfile,
+                hasUser = profileUiState.currentUser != null,
             )
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        Text(
-            text = profileUiState.currentUser?.email ?: "@trilby_friend123456",
-            style = TextStyle(
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
-            ),
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        if (profileUiState.currentUser != null) {
-            ProfileContentAfterSignIn()
+        }
+    ) { innerPadding ->
+        if (isLoading) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+            ) {
+                CircularProgressIndicator()
+            }
         } else {
-            ProfileContentBeforeSignIn(
-                onNavigate = onNavigate
-            )
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(horizontal = 20.dp)
+            ) {
+                Spacer(Modifier.height(16.dp))
+
+                Text(
+                    text = profileUiState.currentUser?.name ?: "Trilby Friend",
+                    style = TextStyle(
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Black
+                    )
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = profileUiState.currentUser?.email ?: "@trilby_friend123456",
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    ),
+                )
+
+                Spacer(Modifier.height(24.dp))
+
+                if (profileUiState.currentUser != null) {
+                    ProfileContentAfterSignIn()
+                } else {
+                    ProfileContentBeforeSignIn(
+                        onNavigateToLogin = onNavigateToLogin,
+                        onNavigateToRegister = onNavigateToRegister,
+                    )
+                }
+            }
         }
     }
 }
@@ -269,7 +298,8 @@ fun ProfileContentAfterSignIn(
 
 @Composable
 fun ProfileContentBeforeSignIn(
-    onNavigate: (route: Route) -> Unit,
+    onNavigateToLogin: (route: Route) -> Unit,
+    onNavigateToRegister: (route: Route) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column {
@@ -292,7 +322,7 @@ fun ProfileContentBeforeSignIn(
             Column {
                 OutlinedButton(
                     onClick = {
-                        onNavigate(Route.Register)
+                        onNavigateToRegister(Route.Register)
                     },
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.outlinedButtonColors().copy(
@@ -319,7 +349,7 @@ fun ProfileContentBeforeSignIn(
 
                 OutlinedButton(
                     onClick = {
-                        onNavigate(Route.Login)
+                        onNavigateToLogin(Route.Login)
                     },
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.outlinedButtonColors().copy(
@@ -439,9 +469,9 @@ fun ShowSignOutDialog(
 @Composable
 private fun ProfileViewPreview() {
     ProfileView(
-        showBottomSheet = false,
-        onDismissBottomSheet = {},
-        onNavigate = {},
+        onNavigateToEditProfile = {},
+        onNavigateToLogin = {},
+        onNavigateToRegister = {}
     )
 }
 
@@ -449,7 +479,8 @@ private fun ProfileViewPreview() {
 @Composable
 private fun ProfileContentBeforeSignInPreview() {
     ProfileContentBeforeSignIn(
-        onNavigate = {}
+        onNavigateToLogin = {},
+        onNavigateToRegister = {}
     )
 }
 
