@@ -17,6 +17,9 @@ class RegisterViewModel @Inject constructor(
     private val repository: AuthRepository
 ) : ViewModel() {
 
+    var name by mutableStateOf("")
+        private set
+
     var email by mutableStateOf("")
         private set
 
@@ -25,6 +28,10 @@ class RegisterViewModel @Inject constructor(
 
     var confirmPassword by mutableStateOf("")
         private set
+
+    fun updateName(newName: String) {
+        name = newName
+    }
 
     fun updateEmail(newEmail: String) {
         email = newEmail
@@ -44,9 +51,9 @@ class RegisterViewModel @Inject constructor(
         viewModelScope.launch {
             Log.i("TAG", "onSignUpClick: Loading....")
             onNavigate(Route.Splash)
-           val result = repository.signUp(email, password)
+           val result = repository.signUp(name, email, password)
             if (result.isSuccess) {
-                onNavigate(Route.Login)
+                onNavigate(Route.InApp)
             } else {
                 onNavigate(Route.Register)
             }

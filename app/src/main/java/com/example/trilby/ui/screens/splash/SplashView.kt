@@ -15,8 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun SplashView(
 //    viewModel: SplashViewModel = hiltViewModel(),
-    onNavigateToLogin: () -> Unit,
-    onNavigateToTrilby: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 //    val isLoggedIn by viewModel.isLoggedIn.collectAsState()
@@ -37,8 +35,5 @@ fun SplashView(
 @Preview(showBackground = true)
 @Composable
 private fun SplashViewPreview() {
-    SplashView(
-        onNavigateToLogin = {},
-        onNavigateToTrilby = {},
-    )
+    SplashView()
 }

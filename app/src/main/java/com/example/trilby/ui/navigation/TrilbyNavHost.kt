@@ -1,6 +1,5 @@
 package com.example.trilby.ui.navigation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -9,62 +8,122 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
-import com.example.trilby.data.repositories.word_repository.ShowWord
-import com.example.trilby.ui.TrilbyAppUiState
+import com.example.trilby.ui.screens.auth.login.LoginView
+import com.example.trilby.ui.screens.auth.register.RegisterView
 import com.example.trilby.ui.screens.dictionary.DictionaryView
+import com.example.trilby.ui.screens.edit_profile.EditProfileView
 import com.example.trilby.ui.screens.favorites.FavoritesView
 import com.example.trilby.ui.screens.practice.PracticeView
 import com.example.trilby.ui.screens.profile.ProfileView
+import com.example.trilby.ui.screens.splash.SplashView
 import com.example.trilby.ui.screens.word_detail.WordDetailView
 
 @Composable
 fun TrilbyNavHost(
-    trilbyAppUiState: TrilbyAppUiState,
     navController: NavHostController,
-    onNavigateToDetail: (route: Route, word: ShowWord) -> Unit,
-    onNavigate: (route: Route) -> Unit,
     sharedViewModel: SharedViewModel = hiltViewModel(),
-    showBottomSheet: Boolean,
-    onDismissBottomSheet: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
-
     NavHost(
         navController = navController,
-        startDestination = Route.Dictionary,
-        modifier
+        startDestination = Route.InApp,
     ) {
-        composable<Route.Dictionary> {
-            DictionaryView(
-                words = trilbyAppUiState.words,
-                isLoading =  trilbyAppUiState.isLoading,
-                onNavigateToDetail = onNavigateToDetail,
-                sharedViewModel = sharedViewModel,
-            )
+        navigation<Route.InApp>(startDestination = Route.Dictionary) {
+            composable<Route.Dictionary> {
+                DictionaryView(
+                    sharedViewModel = sharedViewModel,
+                    onNavigateToDetail = { route ->
+                        navController.navigate(route)
+                    }
+                )
+            }
+            composable<Route.Favorites> {
+                FavoritesView(
+                    sharedViewModel = sharedViewModel,
+                    onNavigateToDetail = { route ->
+                        navController.navigate(route)
+                    }
+                )
+            }
+            composable<Route.Practice> {
+                PracticeView()
+            }
+            composable<Route.Profile> {
+                ProfileView(
+                    onNavigateToEditProfile = { route ->
+                        navController.navigate(route)
+                    },
+                    onNavigateToLogin = { route ->
+                        navController.navigate(route)
+                    },
+                    onNavigateToRegister = { route ->
+                        navController.navigate(route)
+                    },
+                )
+            }
         }
-        composable<Route.Favorites> {
-            FavoritesView(
-                onNavigateToDetail = onNavigateToDetail,
-                sharedViewModel = sharedViewModel,
-            )
-        }
-        composable<Route.Practice> { PracticeView() }
-        composable<Route.Profile> {
-            ProfileView(
-                showBottomSheet = showBottomSheet,
-                onDismissBottomSheet = onDismissBottomSheet,
-                onNavigate = onNavigate
-            )
-        }
+
         composable<Route.WordDetail> { backStateEntry ->
             val wordDetail: Route.WordDetail = backStateEntry.toRoute()
             val uiState by sharedViewModel.uiState.collectAsState()
-            Log.i("TAG", "TrilbyNavHost, words change: ${uiState.words}")
             WordDetailView(
                 wordDetail = wordDetail,
                 words = uiState.words,
+                onPopBack = {
+                    navController.popBackStack()
+                },
             )
+        }
+
+        composable<Route.Login> {
+            LoginView(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onSignInNavigate = { route ->
+                    navController.navigate(route) {
+                        popUpTo(route) {
+                            inclusive = true
+                        }
+                    }
+                },
+            )
+        }
+
+        composable<Route.Register> {
+            RegisterView(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onSignUpNavigate = { route ->
+                    navController.navigate(route) {
+                        if (route == Route.Login) {
+                            popUpTo(Route.Register) {
+                                inclusive = true
+                            }
+                        } else {
+                            popUpTo(route) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                },
+            )
+        }
+
+        composable<Route.EditProfile> {
+            EditProfileView(
+                onCancelClick = {
+                    navController.popBackStack()
+                },
+                onSaveClick = { }
+            )
+        }
+
+        composable<Route.Splash> {
+            SplashView()
         }
     }
 }

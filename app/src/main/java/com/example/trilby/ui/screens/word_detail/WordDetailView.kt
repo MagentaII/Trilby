@@ -23,8 +23,11 @@ import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,45 +42,68 @@ import com.example.trilby.data.repositories.word_repository.Word
 import com.example.trilby.data.repositories.word_repository.WordPrs
 import com.example.trilby.data.repositories.word_repository.WordSound
 import com.example.trilby.ui.navigation.Route
+import com.example.trilby.ui.util.DetailTopAppBar
 
 @Composable
 fun WordDetailView(
     wordDetail: Route.WordDetail,
     words: List<ShowWord>,
+    onPopBack: () -> Unit,
     viewModel: WordDetailViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
+
+    val wordDetailUiState by viewModel.uiState.collectAsState()
     val selectedWord = words.find { it.uid == wordDetail.uid }
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 8.dp, vertical = 28.dp)
-    ) {
-        // Header Section
-        Log.i("TAG", "WordDetailView, headwords: $selectedWord")
-        HeaderSection(
-            word = selectedWord?.uid ?: "Error"
-        )
 
-        Spacer(Modifier.height(14.dp))
-        HorizontalDivider(
-            modifier = Modifier
-                .width(250.dp)
-                .padding(start = 8.dp),
-            thickness = 3.dp,
-            color = Color(0xFFC3CFEA)
-        )
+    viewModel.isWordExist(selectedWord ?: ShowWord.empty)
 
-        selectedWord?.words?.forEach { word ->
-            Spacer(Modifier.height(14.dp))
-            // Word Details Section
-            WordDetailsSection(
-                viewModel = viewModel,
-                label = word.label,
-                prs = word.wordPrs,
-                shortDef = word.shortDef
+    Scaffold(
+        topBar = {
+            DetailTopAppBar(
+                title = selectedWord?.uid ?: "Error",
+                onPopBack = onPopBack,
+                saveWord = {
+                    viewModel.saveWord(word = selectedWord ?: ShowWord.empty)
+//                        viewModel.addFirestoreWords(word = currentWord)
+                },
+                deleteWord = { viewModel.deleteWord(word = selectedWord ?: ShowWord.empty) },
+                isSaveWord = wordDetailUiState.isFavorite,
             )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(innerPadding)
+                .padding(horizontal = 8.dp, vertical = 28.dp)
+        ) {
+            // Header Section
+            Log.i("TAG", "WordDetailView, headwords: $selectedWord")
+            HeaderSection(
+                word = selectedWord?.uid ?: "Error"
+            )
+
+            Spacer(Modifier.height(14.dp))
+            HorizontalDivider(
+                modifier = Modifier
+                    .width(250.dp)
+                    .padding(start = 8.dp),
+                thickness = 3.dp,
+                color = Color(0xFFC3CFEA)
+            )
+
+            selectedWord?.words?.forEach { word ->
+                Spacer(Modifier.height(14.dp))
+                // Word Details Section
+                WordDetailsSection(
+                    viewModel = viewModel,
+                    label = word.label,
+                    prs = word.wordPrs,
+                    shortDef = word.shortDef
+                )
+            }
         }
     }
 }
@@ -258,5 +284,6 @@ private fun WordDetailViewPreview() {
     WordDetailView(
         wordDetail = wordDetail,
         words = fakeWords,
+        onPopBack = {},
     )
 }

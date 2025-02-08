@@ -22,7 +22,7 @@ import com.example.trilby.ui.navigation.Route
 @Composable
 fun WordCard(
     word: ShowWord,
-    onNavigateToDetail: (route: Route, word: ShowWord) -> Unit,
+    onNavigateToDetail: (route: Route) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -36,7 +36,6 @@ fun WordCard(
                 Route.WordDetail(
                     uid = word.uid,
                 ),
-                word
             )
         },
     ) {
@@ -81,8 +80,8 @@ private fun WordCardView() {
 
     WordCard(
         defaultWord,
-        onNavigateToDetail = { route, name ->
-            Log.i("TAG", "WordCardView, route, name: $route and $name")
+        onNavigateToDetail = { route ->
+            Log.i("TAG", "WordCardView, route, name: $route")
         }
     )
 }
