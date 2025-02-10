@@ -2,7 +2,6 @@ package com.example.trilby.data.repositories.auth_repository
 
 import android.util.Log
 import com.example.trilby.data.sources.network.auth_network_source.AuthService
-import com.example.trilby.data.sources.network.auth_network_source.User
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -11,6 +10,7 @@ import javax.inject.Inject
 
 interface AuthRepository {
     fun currentUser(): Flow<FirebaseUser?>
+    fun getCurrentUserUid(): String?
     suspend fun getUserInformation(uid: String?): User?
     fun hasUser(): Boolean
     suspend fun signIn(email: String, password: String): Result<Boolean>
@@ -26,12 +26,16 @@ class AuthRepositoryImpl @Inject constructor(
         return authService.currentUser()
     }
 
+    override fun getCurrentUserUid(): String? {
+        return authService.getCurrentUserUid()
+    }
+
     override suspend fun getUserInformation(uid: String?): User? {
         return try {
             withContext(Dispatchers.IO) {
                 val user = authService.getUserInformation(uid)
                 Log.i("Firestore", "getUserInformation: ${user?.name}")
-                user
+                user?.toExternal()
             }
         } catch (e: Exception) {
             Log.i("Firestore", "getUserInformation: $e")

@@ -20,9 +20,6 @@ interface WordDao {
     suspend fun insertWords(words: List<LocalWord>)
 
     @Delete
-    suspend fun deleteWord(word: LocalWord)
-
-    @Delete
     suspend fun deleteWords(words: List<LocalWord>)
 
     @Query("SELECT * FROM LocalWord")
@@ -30,6 +27,12 @@ interface WordDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM LocalWord WHERE id = :id)")
     suspend fun isWordExist(id: String): Boolean
+
+    @Query("DELETE FROM LocalWord")
+    suspend fun deleteAllWords()
+
+    @Query("SELECT EXISTS(SELECT 1 FROM LocalWord LIMIT 1)")
+    suspend fun hasWords(): Boolean
 }
 
 @Database(entities = [LocalWord::class], version = 2)

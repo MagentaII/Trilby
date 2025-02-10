@@ -15,14 +15,18 @@ interface WordRepository {
     suspend fun search(query: String): List<ShowWord>
 
     // Local
-    suspend fun saveWord(word: ShowWord)
-    suspend fun getAllWords(): List<ShowWord>
-    suspend fun deleteWord(word: ShowWord)
-    suspend fun isWordExist(word: ShowWord): Boolean
+    suspend fun saveWordToLocal(showWord: ShowWord)
+    suspend fun saveAllWordsToLocal(showWords: List<ShowWord>)
+    suspend fun fetchAllWordsToLocal(userUid: String?): List<ShowWord>
+    suspend fun deleteWordForLocal(word: ShowWord)
+    suspend fun isWordExistInLocal(word: ShowWord): Boolean
+    suspend fun deleteAllWordsForLocal()
+    suspend fun haveWordsInLocal(): Boolean
 
     // firestore
-    suspend fun getFirestoreWords(): List<ShowWord>
-    suspend fun addFirestoreWords(showWord: ShowWord)
+    suspend fun fetchAllWordFromFirestore(userUid: String?): List<ShowWord>
+    suspend fun saveWordToFirestore(showWord: ShowWord, userUid: String?)
+    suspend fun deleteWordForFirestore(showWord: ShowWord, userUid: String?)
 }
 
 class WordRepositoryImpl @Inject constructor(
@@ -69,15 +73,15 @@ class WordRepositoryImpl @Inject constructor(
     }
 
     // Local
-    override suspend fun saveWord(word: ShowWord) {
-        val words: List<Word> = List(word.words.size) { index ->
+    override suspend fun saveWordToLocal(showWord: ShowWord) {
+        val words: List<Word> = List(showWord.words.size) { index ->
             Word(
-                wordId = word.words[index].wordId,
-                wordUuid = word.words[index].wordUuid,
-                headword = word.words[index].headword,
-                wordPrs = word.words[index].wordPrs,
-                label = word.words[index].label,
-                shortDef = word.words[index].shortDef,
+                wordId = showWord.words[index].wordId,
+                wordUuid = showWord.words[index].wordUuid,
+                headword = showWord.words[index].headword,
+                wordPrs = showWord.words[index].wordPrs,
+                label = showWord.words[index].label,
+                shortDef = showWord.words[index].shortDef,
             )
         }
         try {
@@ -89,7 +93,46 @@ class WordRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllWords(): List<ShowWord> {
+    override suspend fun saveAllWordsToLocal(showWords: List<ShowWord>) {
+        showWords.forEach { showWord ->
+            val words: List<Word> = List(showWord.words.size) { index ->
+                Word(
+                    wordId = showWord.words[index].wordId,
+                    wordUuid = showWord.words[index].wordUuid,
+                    headword = showWord.words[index].headword,
+                    wordPrs = showWord.words[index].wordPrs,
+                    label = showWord.words[index].label,
+                    shortDef = showWord.words[index].shortDef,
+                )
+            }
+            try {
+                withContext(Dispatchers.IO) {
+                    wordDao.insertWords(words = words.toLocal())
+                    Log.i("Room", "saveAllWords: Success save word")
+                }
+            } catch (e: Exception) {
+                Log.i("Room", "saveAllWords: Failure save word, and $e")
+            }
+
+        }
+    }
+
+    override suspend fun fetchAllWordsToLocal(userUid: String?): List<ShowWord> {
+        val haveWordsFromLocal = haveWordsInLocal()
+        if (!haveWordsFromLocal) {
+            try {
+                if (!userUid.isNullOrEmpty()) {
+                    withContext(Dispatchers.IO) {
+                        val showWords = fetchAllWordFromFirestore(userUid)
+                        saveAllWordsToLocal(showWords)
+                    }
+                } else {
+                    Log.i("Room", "fetchAllWordsToLocal: userUid is empty")
+                }
+            } catch (e: Exception) {
+                Log.d("TAG", "getAllWords: $e")
+            }
+        }
         val localWords = try {
             withContext(Dispatchers.IO) {
                 wordDao.getAllWords()
@@ -98,7 +141,7 @@ class WordRepositoryImpl @Inject constructor(
             Log.d("TAG", "getAllWords: $e")
             emptyList()
         }
-        return localWords.toExternal()
+        val showWords = localWords.toExternal()
             .groupBy { word -> word.wordId.substringBefore(":") }
             .map { (uid, words) ->
                 ShowWord(
@@ -106,9 +149,10 @@ class WordRepositoryImpl @Inject constructor(
                     words = words
                 )
             }
+        return showWords
     }
 
-    override suspend fun deleteWord(word: ShowWord) {
+    override suspend fun deleteWordForLocal(word: ShowWord) {
         val words: List<Word> = List(word.words.size) { index ->
             Word(
                 wordId = word.words[index].wordId,
@@ -128,7 +172,7 @@ class WordRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun isWordExist(word: ShowWord): Boolean {
+    override suspend fun isWordExistInLocal(word: ShowWord): Boolean {
         val words: List<Word> = List(word.words.size) { index ->
             Word(
                 wordId = word.words[index].wordId,
@@ -150,17 +194,46 @@ class WordRepositoryImpl @Inject constructor(
         return isExist
     }
 
-    override suspend fun getFirestoreWords(): List<ShowWord> {
+    override suspend fun deleteAllWordsForLocal() {
+        try {
+            withContext(Dispatchers.IO) {
+                wordDao.deleteAllWords()
+                Log.i("Room", "deleteAllWords: Success delete all words")
+            }
+        } catch (e: Exception) {
+            Log.i("Room", "deleteAllWords: Failure delete all words, and $e")
+        }
+    }
+
+    override suspend fun haveWordsInLocal(): Boolean {
         return try {
             withContext(Dispatchers.IO) {
-                wordsFirestoreService.getWord().toExternal()
-                    .groupBy { word -> word.wordId.substringBefore(":") }
-                    .map { (uid, words) ->
-                        ShowWord(
-                            uid = uid,
-                            words = words
-                        )
-                    }
+                val hasWords = wordDao.hasWords()
+                Log.i("Room", "hasWords: Success $hasWords")
+                hasWords
+            }
+        } catch (e: Exception) {
+            Log.i("Room", "hasWords: Failure $e")
+            false
+        }
+    }
+
+    override suspend fun fetchAllWordFromFirestore(userUid: String?): List<ShowWord> {
+        return try {
+            withContext(Dispatchers.IO) {
+                if (!userUid.isNullOrEmpty()) {
+                    wordsFirestoreService.fetchAllWordFromFirestore(userUid = userUid).toExternal()
+                        .groupBy { word -> word.wordId.substringBefore(":") }
+                        .map { (uid, words) ->
+                            ShowWord(
+                                uid = uid,
+                                words = words
+                            )
+                        }
+                } else {
+                    Log.i("repository", "fetchAllWordFromFirestore: userUid is empty")
+                    emptyList()
+                }
             }
         } catch (e: Exception) {
             Log.d("repository", "getFirestoreWord: $e")
@@ -168,17 +241,38 @@ class WordRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun addFirestoreWords(showWord: ShowWord) {
+    override suspend fun saveWordToFirestore(showWord: ShowWord, userUid: String?) {
         val firestoreWords = showWord.words.map { word ->
             word.toFirestore()
         }
         try {
             withContext(Dispatchers.IO) {
-                wordsFirestoreService.addWord(firestoreWords)
+                if (!userUid.isNullOrEmpty()) {
+                    wordsFirestoreService.saveWordToFirestore(firestoreWords, userUid)
+                } else {
+                    Log.i("repository", "addFirestoreWords: userUid is empty")
+                }
             }
         } catch (e: Exception) {
             Log.d("repository", "addFirestoreWords: $e")
         }
 
+    }
+
+    override suspend fun deleteWordForFirestore(showWord: ShowWord, userUid: String?) {
+        val firestoreWords = showWord.words.map { word ->
+            word.toFirestore()
+        }
+        try {
+            withContext(Dispatchers.IO) {
+                if (!userUid.isNullOrEmpty()) {
+                    wordsFirestoreService.deleteWordForFirestore(firestoreWords, userUid)
+                } else {
+                    Log.i("repository", "deleteFirestoreWords: userUid is empty")
+                }
+            }
+        } catch (e: Exception) {
+            Log.d("repository", "deleteFirestoreWords: $e")
+        }
     }
 }

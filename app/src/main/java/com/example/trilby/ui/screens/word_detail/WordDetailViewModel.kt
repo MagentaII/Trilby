@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
+import com.example.trilby.data.repositories.auth_repository.AuthRepository
 import com.example.trilby.data.repositories.word_repository.ShowWord
 import com.example.trilby.data.repositories.word_repository.WordPrs
 import com.example.trilby.data.repositories.word_repository.WordRepository
@@ -24,6 +25,7 @@ data class WordDetailUiState(
 @HiltViewModel
 class WordDetailViewModel @Inject constructor(
     private val wordRepository: WordRepository,
+    private val authRepository: AuthRepository,
     private val exoPlayer: ExoPlayer,
 ) : ViewModel() {
 
@@ -43,21 +45,33 @@ class WordDetailViewModel @Inject constructor(
 
     fun saveWord(word: ShowWord) {
         viewModelScope.launch {
-            wordRepository.saveWord(word = word)
+            val userUid = authRepository.getCurrentUserUid()
+            wordRepository.saveWordToLocal(showWord = word)
             isWordExist(word)
+            if (!userUid.isNullOrEmpty()) {
+                wordRepository.saveWordToFirestore(showWord = word, userUid = userUid)
+            } else {
+                Log.i("Room", "saveWord: userUid is empty")
+            }
         }
     }
 
     fun deleteWord(word: ShowWord) {
         viewModelScope.launch {
-            wordRepository.deleteWord(word = word)
+            val userUid = authRepository.getCurrentUserUid()
+            wordRepository.deleteWordForLocal(word = word)
             isWordExist(word)
+            if (!userUid.isNullOrEmpty()) {
+                wordRepository.deleteWordForFirestore(showWord = word, userUid = userUid)
+            } else {
+                Log.i("Room", "deleteWord: userUid is empty")
+            }
         }
     }
 
     fun isWordExist(word: ShowWord) {
         viewModelScope.launch {
-            val isExist = wordRepository.isWordExist(word = word)
+            val isExist = wordRepository.isWordExistInLocal(word = word)
             _uiState.update { currentState ->
                 currentState.copy(
                     isFavorite = isExist
@@ -65,4 +79,10 @@ class WordDetailViewModel @Inject constructor(
             }
         }
     }
+
+//    fun saveWordToFirestore(word: ShowWord) {
+//        viewModelScope.launch {
+//            wordRepository.saveWordToFirestore(word)
+//        }
+//    }
 }

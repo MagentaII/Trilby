@@ -1,8 +1,8 @@
 package com.example.trilby.ui.screens.favorites
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.trilby.data.repositories.auth_repository.AuthRepository
 import com.example.trilby.data.repositories.word_repository.ShowWord
 import com.example.trilby.data.repositories.word_repository.WordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,11 +20,18 @@ data class FavoritesUiState(
 
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
-    private val repository: WordRepository
+    private val wordRepository: WordRepository,
+    private val authRepository: AuthRepository
+
 ) : ViewModel() {
     // state
     private val _uiState = MutableStateFlow(FavoritesUiState())
     val uiState: StateFlow<FavoritesUiState> = _uiState.asStateFlow()
+
+//    init {
+//        fetchAllWordFromFirestore()
+//        getAllSaveWords()
+//    }
 
     fun getAllSaveWords() {
         viewModelScope.launch {
@@ -33,7 +40,8 @@ class FavoritesViewModel @Inject constructor(
                     isLoading = true,
                 )
             }
-            val words = repository.getAllWords()
+            val userUid = authRepository.getCurrentUserUid()
+            val words = wordRepository.fetchAllWordsToLocal(userUid = userUid)
             _uiState.update { currentState ->
                 currentState.copy(
                     savedWords = words,
@@ -43,21 +51,20 @@ class FavoritesViewModel @Inject constructor(
         }
     }
 
-    fun getFirestoreWord() {
-        _uiState.update { currentState ->
-            currentState.copy(
-                isLoading = true,
-            )
-        }
-        viewModelScope.launch {
-            val showWords = repository.getFirestoreWords()
-            Log.d("FavoritesViewModel", "getFirestoreWord, showWords: $showWords")
-            _uiState.update { currentState ->
-                currentState.copy(
-                    savedWords = showWords,
-                    isLoading = false,
-                )
-            }
-        }
-    }
+//    fun fetchAllWordFromFirestore() {
+//        _uiState.update { currentState ->
+//            currentState.copy(
+//                isLoading = true,
+//            )
+//        }
+//        viewModelScope.launch {
+//            val showWords = repository.fetchAllWordFromFirestore()
+//            val hasWords = repository.hasWords()
+//            if (!hasWords) {
+//                Log.i("Room", "There is no words in the room")
+//                repository.saveAllWordsToLocal(showWords = showWords)
+//            }
+//            Log.d("FavoritesViewModel", "getFirestoreWord, showWords: $showWords")
+//        }
+//    }
 }

@@ -17,7 +17,8 @@ import javax.inject.Inject
 
 interface AuthService {
     fun currentUser(): Flow<FirebaseUser?>
-    suspend fun getUserInformation(uid: String?): User?
+    fun getCurrentUserUid(): String?
+    suspend fun getUserInformation(uid: String?): NetworkUser?
     fun hasUser(): Boolean
     suspend fun signIn(email: String, password: String): Result<Boolean>
     suspend fun signUp(name: String, email: String, password: String): Result<Boolean>
@@ -42,7 +43,11 @@ class AuthServiceImpl @Inject constructor(
         return currentUserFlow
     }
 
-    override suspend fun getUserInformation(uid: String?): User? {
+    override fun getCurrentUserUid(): String? {
+        return auth.uid
+    }
+
+    override suspend fun getUserInformation(uid: String?): NetworkUser? {
         val db = firebase.firestore
         return try {
             if (uid != null) {
@@ -50,7 +55,7 @@ class AuthServiceImpl @Inject constructor(
                 val document = db.collection("users").document(uid).get().await()
                 if (document.exists()) {
                     Log.i("Firestore", "getUserInformation: ${document.exists()}")
-                    document.toObject<User>()
+                    document.toObject<NetworkUser>()
                 } else {
                     Log.i("Firestore", "getUserInformation: document no exists ")
                     null

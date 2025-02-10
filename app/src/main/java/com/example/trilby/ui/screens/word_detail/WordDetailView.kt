@@ -65,9 +65,10 @@ fun WordDetailView(
                 onPopBack = onPopBack,
                 saveWord = {
                     viewModel.saveWord(word = selectedWord ?: ShowWord.empty)
-//                        viewModel.addFirestoreWords(word = currentWord)
                 },
-                deleteWord = { viewModel.deleteWord(word = selectedWord ?: ShowWord.empty) },
+                deleteWord = {
+                    viewModel.deleteWord(word = selectedWord ?: ShowWord.empty)
+                },
                 isSaveWord = wordDetailUiState.isFavorite,
             )
         }
