@@ -11,13 +11,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 
 interface AuthService {
     fun currentUser(): Flow<FirebaseUser?>
-    fun getCurrentUserUid(): String?
+    fun getCurrentUserUid(): Flow<String?>
     suspend fun getUserInformation(uid: String?): NetworkUser?
     fun hasUser(): Boolean
     suspend fun signIn(email: String, password: String): Result<Boolean>
@@ -27,7 +28,7 @@ interface AuthService {
 
 class AuthServiceImpl @Inject constructor(
     private val auth: FirebaseAuth,
-    private val firebase: Firebase
+    private val firebase: Firebase,
 ) : AuthService {
 
     private val _currentUserFlow = MutableStateFlow(auth.currentUser)
@@ -43,8 +44,10 @@ class AuthServiceImpl @Inject constructor(
         return currentUserFlow
     }
 
-    override fun getCurrentUserUid(): String? {
-        return auth.uid
+    override fun getCurrentUserUid(): Flow<String?> {
+        return currentUser().map { user ->
+            user?.uid
+        }
     }
 
     override suspend fun getUserInformation(uid: String?): NetworkUser? {
@@ -103,7 +106,7 @@ class AuthServiceImpl @Inject constructor(
                 )
 
                 db.collection("users").document(userId).set(user).await()
-                Result.success(true) // 註冊與 Firestore 更新成功
+                Result.success(true)
             } else {
                 Result.failure(Exception("User ID is null"))
             }
@@ -111,15 +114,6 @@ class AuthServiceImpl @Inject constructor(
             Result.failure(e)
         }
     }
-
-//    override suspend fun signUp(name: String, email: String, password: String): Result<FirebaseUser?> {
-//        return try {
-//            val result = auth.createUserWithEmailAndPassword(email, password).await()
-//            Result.success(result.user)
-//        } catch (e: Exception) {
-//            Result.failure(e)
-//        }
-//    }
 
     override suspend fun signOut() {
         auth.signOut()

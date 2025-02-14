@@ -10,12 +10,12 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.trilby.ui.navigation.Route
 import com.example.trilby.ui.navigation.SharedViewModel
 import com.example.trilby.ui.util.AddSearchBarTopAppBar
@@ -28,7 +28,7 @@ fun DictionaryView(
     onNavigateToDetail: (route: Route) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val dictionaryUiState by viewModel.uiState.collectAsState()
+    val dictionaryUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val showWords = dictionaryUiState.words
     val isLoading = dictionaryUiState.isLoading
 

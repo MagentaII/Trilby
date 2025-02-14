@@ -27,7 +27,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.trilby.ui.navigation.Route
 import com.example.trilby.ui.util.ProfileTopAppBar
 
@@ -54,7 +54,7 @@ fun ProfileView(
     onNavigateToRegister: (route: Route) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val profileUiState by viewModel.uiState.collectAsState()
+    val profileUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState()
     var showDialog by remember { mutableStateOf(false) }
     val isLoading = profileUiState.isLoading

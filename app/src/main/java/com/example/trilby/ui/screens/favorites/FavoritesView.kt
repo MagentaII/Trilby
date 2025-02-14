@@ -10,12 +10,12 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.trilby.ui.navigation.Route
 import com.example.trilby.ui.navigation.SharedViewModel
 import com.example.trilby.ui.util.DefaultTopAppBar
@@ -28,13 +28,9 @@ fun FavoritesView(
     onNavigateToDetail: (route: Route) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val favoritesUiState by viewModel.uiState.collectAsState()
+    val favoritesUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val words = favoritesUiState.savedWords
     val isLoading = favoritesUiState.isLoading
-
-    LaunchedEffect(Unit) {
-        viewModel.getAllSaveWords()
-    }
 
     LaunchedEffect(words) {
         Log.i("TAG", "FavoritesView, words change: $words")

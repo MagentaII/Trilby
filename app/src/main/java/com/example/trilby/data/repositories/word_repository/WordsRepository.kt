@@ -6,6 +6,12 @@ import com.example.trilby.data.sources.local.WordDao
 import com.example.trilby.data.sources.network.word_api_network_source.DictionaryApiService
 import com.example.trilby.data.sources.network.word_firestore_network_source.WordsFirestoreService
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -17,7 +23,7 @@ interface WordRepository {
     // Local
     suspend fun saveWordToLocal(showWord: ShowWord)
     suspend fun saveAllWordsToLocal(showWords: List<ShowWord>)
-    suspend fun fetchAllWordsToLocal(userUid: String?): List<ShowWord>
+    fun fetchAllWordsToLocal(userUid: String?): Flow<List<ShowWord>>
     suspend fun deleteWordForLocal(word: ShowWord)
     suspend fun isWordExistInLocal(word: ShowWord): Boolean
     suspend fun deleteAllWordsForLocal()
@@ -117,39 +123,42 @@ class WordRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun fetchAllWordsToLocal(userUid: String?): List<ShowWord> {
-        val haveWordsFromLocal = haveWordsInLocal()
-        if (!haveWordsFromLocal) {
-            try {
-                if (!userUid.isNullOrEmpty()) {
-                    withContext(Dispatchers.IO) {
+    override fun fetchAllWordsToLocal(userUid: String?): Flow<List<ShowWord>> {
+        return flow {
+            val haveWordsFromLocal = haveWordsInLocal()
+            if (!haveWordsFromLocal) {
+                Log.i("Room", "fetchAllWordsToLocal: Room is empty")
+                try {
+                    if (!userUid.isNullOrEmpty()) {
                         val showWords = fetchAllWordFromFirestore(userUid)
                         saveAllWordsToLocal(showWords)
+                    } else {
+                        Log.i("Room", "fetchAllWordsToLocal: userUid is empty")
                     }
-                } else {
-                    Log.i("Room", "fetchAllWordsToLocal: userUid is empty")
+                } catch (e: Exception) {
+                    Log.d("Room", "fetchAllWordsToLocal: getAllWords: $e")
                 }
-            } catch (e: Exception) {
-                Log.d("TAG", "getAllWords: $e")
             }
+            Log.i("Room", "fetchAllWordsToLocal: Room is not empty")
+            // 直接監聽 Room，轉換數據格式
+            emitAll(
+                wordDao.getAllWords().map { localWords ->
+                    localWords.toExternal()
+                        .groupBy { word -> word.wordId.substringBefore(":") }
+                        .map { (uid, words) ->
+                            ShowWord(
+                                uid = uid,
+                                words = words
+                            )
+                        }
+                }
+            )
         }
-        val localWords = try {
-            withContext(Dispatchers.IO) {
-                wordDao.getAllWords()
+            .flowOn(Dispatchers.IO)
+            .catch { e ->
+                Log.d("TAG", "fetchAllWordsToLocal: Error processing data: $e")
+                emit(emptyList())
             }
-        } catch (e: Exception) {
-            Log.d("TAG", "getAllWords: $e")
-            emptyList()
-        }
-        val showWords = localWords.toExternal()
-            .groupBy { word -> word.wordId.substringBefore(":") }
-            .map { (uid, words) ->
-                ShowWord(
-                    uid = uid,
-                    words = words
-                )
-            }
-        return showWords
     }
 
     override suspend fun deleteWordForLocal(word: ShowWord) {

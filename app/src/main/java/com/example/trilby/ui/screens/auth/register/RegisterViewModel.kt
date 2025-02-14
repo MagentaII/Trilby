@@ -55,7 +55,7 @@ class RegisterViewModel @Inject constructor(
             onNavigate(Route.Splash)
             val result = authRepository.signUp(name, email, password)
             if (result.isSuccess) {
-                wordRepository.deleteAllWordsForLocal()
+//                wordRepository.deleteAllWordsForLocal()
                 onNavigate(Route.InApp)
             } else {
                 onNavigate(Route.Register)
