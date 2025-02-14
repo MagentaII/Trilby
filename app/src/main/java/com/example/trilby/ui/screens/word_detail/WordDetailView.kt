@@ -26,7 +26,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.trilby.data.repositories.word_repository.ShowWord
 import com.example.trilby.data.repositories.word_repository.Word
 import com.example.trilby.data.repositories.word_repository.WordPrs
@@ -53,7 +53,7 @@ fun WordDetailView(
     modifier: Modifier = Modifier
 ) {
 
-    val wordDetailUiState by viewModel.uiState.collectAsState()
+    val wordDetailUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val selectedWord = words.find { it.uid == wordDetail.uid }
 
     viewModel.isWordExist(selectedWord ?: ShowWord.empty)

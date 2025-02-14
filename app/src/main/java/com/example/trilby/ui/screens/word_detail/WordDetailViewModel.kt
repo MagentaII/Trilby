@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -45,26 +46,29 @@ class WordDetailViewModel @Inject constructor(
 
     fun saveWord(word: ShowWord) {
         viewModelScope.launch {
-            val userUid = authRepository.getCurrentUserUid()
-            wordRepository.saveWordToLocal(showWord = word)
-            isWordExist(word)
-            if (!userUid.isNullOrEmpty()) {
-                wordRepository.saveWordToFirestore(showWord = word, userUid = userUid)
-            } else {
-                Log.i("Room", "saveWord: userUid is empty")
+            authRepository.getCurrentUserUid().collectLatest { userUid ->
+                wordRepository.saveWordToLocal(showWord = word)
+                isWordExist(word)
+                if (!userUid.isNullOrEmpty()) {
+                    wordRepository.saveWordToFirestore(showWord = word, userUid = userUid)
+                } else {
+                    Log.i("Room", "saveWord: userUid is empty")
+                }
             }
+
         }
     }
 
     fun deleteWord(word: ShowWord) {
         viewModelScope.launch {
-            val userUid = authRepository.getCurrentUserUid()
-            wordRepository.deleteWordForLocal(word = word)
-            isWordExist(word)
-            if (!userUid.isNullOrEmpty()) {
-                wordRepository.deleteWordForFirestore(showWord = word, userUid = userUid)
-            } else {
-                Log.i("Room", "deleteWord: userUid is empty")
+            authRepository.getCurrentUserUid().collectLatest { userUid ->
+                wordRepository.deleteWordForLocal(word = word)
+                isWordExist(word)
+                if (!userUid.isNullOrEmpty()) {
+                    wordRepository.deleteWordForFirestore(showWord = word, userUid = userUid)
+                } else {
+                    Log.i("Room", "deleteWord: userUid is empty")
+                }
             }
         }
     }
@@ -79,10 +83,4 @@ class WordDetailViewModel @Inject constructor(
             }
         }
     }
-
-//    fun saveWordToFirestore(word: ShowWord) {
-//        viewModelScope.launch {
-//            wordRepository.saveWordToFirestore(word)
-//        }
-//    }
 }

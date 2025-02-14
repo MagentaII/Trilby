@@ -1,10 +1,10 @@
 package com.example.trilby.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -67,7 +67,7 @@ fun TrilbyNavHost(
 
         composable<Route.WordDetail> { backStateEntry ->
             val wordDetail: Route.WordDetail = backStateEntry.toRoute()
-            val uiState by sharedViewModel.uiState.collectAsState()
+            val uiState by sharedViewModel.uiState.collectAsStateWithLifecycle()
             WordDetailView(
                 wordDetail = wordDetail,
                 words = uiState.words,

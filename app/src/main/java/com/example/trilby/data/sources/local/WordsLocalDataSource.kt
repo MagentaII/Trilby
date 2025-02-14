@@ -9,6 +9,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WordDao {
@@ -23,7 +24,7 @@ interface WordDao {
     suspend fun deleteWords(words: List<LocalWord>)
 
     @Query("SELECT * FROM LocalWord")
-    suspend fun getAllWords(): List<LocalWord>
+    fun getAllWords(): Flow<List<LocalWord>>
 
     @Query("SELECT EXISTS(SELECT 1 FROM LocalWord WHERE id = :id)")
     suspend fun isWordExist(id: String): Boolean

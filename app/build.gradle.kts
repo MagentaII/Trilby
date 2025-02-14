@@ -116,6 +116,10 @@ dependencies {
     implementation("androidx.room:room-ktx:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
     annotationProcessor("androidx.room:room-compiler:$roomVersion")
+
+    // DataStore for local database
+    implementation("androidx.datastore:datastore-preferences:1.1.2")
+
 }
 
 // Kapt configuration for generated code
