@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     // Android & Kotlin Plugins
     alias(libs.plugins.android.application)
@@ -16,11 +18,23 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
 android {
     namespace = "com.example.trilby"
     compileSdk = 35
 
     defaultConfig {
+        buildConfigField(
+            "String",
+            "API_KEY",
+            "\"${localProperties["API_KEY"] ?: ""}\""
+        )
+
         applicationId = "com.example.trilby"
         minSdk = 24
         targetSdk = 34
@@ -29,12 +43,17 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "API_KEY", "\"${project.findProperty("API_KEY")}\"")
     }
 
     buildTypes {
+        debug {
+            isDebuggable = true
+            buildConfigField("Boolean", "LOGGING_ENABLED", "true")
+        }
+
         release {
             isMinifyEnabled = false
+            buildConfigField("Boolean", "LOGGING_ENABLED", "false")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -119,6 +138,9 @@ dependencies {
 
     // DataStore for local database
     implementation("androidx.datastore:datastore-preferences:1.1.2")
+
+    // Timber
+    implementation("com.jakewharton.timber:timber:5.0.1")
 
 }
 

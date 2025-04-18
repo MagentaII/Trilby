@@ -53,7 +53,7 @@ fun DefaultTopAppBar(
     Column(
         modifier = modifier
             .background(Color(0xFF7988A9))
-            .padding(top = 32.dp, start = 16.dp, end = 16.dp)
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
         CenterAlignedTopAppBar(
             title = {
@@ -85,7 +85,7 @@ fun AuthTopAppBar(
     Column(
         modifier = modifier
             .background(Color(0xFF3C4A68))
-            .padding(top = 32.dp, start = 16.dp, end = 16.dp)
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
         CenterAlignedTopAppBar(
             title = {
@@ -138,7 +138,7 @@ fun ProfileTopAppBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color(0xFF7988A9))
-                    .padding(top = 32.dp)
+                    .padding(top = 16.dp)
             ) {
                 LargeTopAppBar(
                     title = { },
@@ -209,7 +209,7 @@ fun EditProfileTopAppBar(
     Column(
         modifier = modifier
             .background(Color(0xFF3C4A68))
-            .padding(top = 32.dp, start = 16.dp, end = 16.dp)
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
         CenterAlignedTopAppBar(
             title = {
@@ -261,15 +261,17 @@ fun EditProfileTopAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddSearchBarTopAppBar(
-    viewModel: DictionaryViewModel = hiltViewModel(),
     title: String,
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onSearch: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Column(
         modifier = modifier
             .background(Color(0xFF7988A9))
-            .padding(top = 32.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
+            .padding(top = 16.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
     ) {
         CenterAlignedTopAppBar(
             title = {
@@ -287,7 +289,9 @@ fun AddSearchBarTopAppBar(
             scrollBehavior = scrollBehavior,
         )
         TrilbySearchBar(
-            viewModel = viewModel
+            onQueryChange = onQueryChange,
+            query = query,
+            onSearch = onSearch
         )
     }
 }
@@ -306,7 +310,7 @@ fun DetailTopAppBar(
     Column(
         modifier = modifier
             .background(Color(0xFF7988A9))
-            .padding(top = 32.dp, start = 16.dp, end = 16.dp)
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
         CenterAlignedTopAppBar(
             title = {
@@ -419,7 +423,12 @@ private fun EditProfileAppBarPreview() {
 @Preview
 @Composable
 private fun AddSearchBarTopAppBarPreview() {
-    AddSearchBarTopAppBar(title = "Dictionary")
+    AddSearchBarTopAppBar(
+        title = "Dictionary",
+        query = "",
+        onQueryChange = {},
+        onSearch = {}
+    )
 }
 
 @Preview

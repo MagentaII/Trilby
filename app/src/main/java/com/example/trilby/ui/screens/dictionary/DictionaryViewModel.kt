@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.trilby.data.repositories.word_repository.Result
 import com.example.trilby.data.repositories.word_repository.ShowWord
 import com.example.trilby.data.repositories.word_repository.WordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +19,7 @@ import javax.inject.Inject
 data class DictionaryUiState(
     val words: List<ShowWord> = emptyList(),
     val isLoading: Boolean = false,
+    val errorMessage: String? = null,
 )
 
 @HiltViewModel
@@ -42,13 +44,25 @@ class DictionaryViewModel @Inject constructor(
                     isLoading = true
                 )
             }
-            val words = wordRepository.search(searchQuery)
-            wordRepository.search(searchQuery)
-            _uiState.update { currentState ->
-                currentState.copy(
-                    words = words,
-                    isLoading = false
-                )
+            when (val result = wordRepository.search(searchQuery)) {
+                is Result.Success -> {
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            words = result.data,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
+                }
+                is Result.Error -> {
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            words = emptyList(),
+                            isLoading = false,
+                            errorMessage = result.errorMessage
+                        )
+                    }
+                }
             }
         }
     }

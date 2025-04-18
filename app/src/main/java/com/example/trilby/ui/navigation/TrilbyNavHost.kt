@@ -33,7 +33,9 @@ fun TrilbyNavHost(
         navigation<Route.InApp>(startDestination = Route.Dictionary) {
             composable<Route.Dictionary> {
                 DictionaryView(
-                    sharedViewModel = sharedViewModel,
+                    onUpdateSharedWords = { sharedWord ->
+                        sharedViewModel.updateWords(sharedWord)
+                    },
                     onNavigateToDetail = { route ->
                         navController.navigate(route)
                     }
@@ -41,7 +43,9 @@ fun TrilbyNavHost(
             }
             composable<Route.Favorites> {
                 FavoritesView(
-                    sharedViewModel = sharedViewModel,
+                    onUpdateSharedWords = { sharedWord ->
+                        sharedViewModel.updateWords(sharedWord)
+                    },
                     onNavigateToDetail = { route ->
                         navController.navigate(route)
                     }

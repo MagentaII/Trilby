@@ -13,12 +13,20 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
+import timber.log.Timber
+import java.io.IOException
 import javax.inject.Inject
+
+sealed class Result<out T> {
+    data class Success<T>(val data: T) : Result<T>()
+    data class Error(val errorMessage: String) : Result<Nothing>()
+}
 
 interface WordRepository {
     // Network
-    var searchWords: List<ShowWord>
-    suspend fun search(query: String): List<ShowWord>
+//    var searchWords: List<ShowWord>
+    suspend fun search(query: String): Result<List<ShowWord>>
 
     // Local
     suspend fun saveWordToLocal(showWord: ShowWord)
@@ -42,40 +50,32 @@ class WordRepositoryImpl @Inject constructor(
 ) : WordRepository {
 
     // Network
-    override var searchWords: List<ShowWord> = emptyList()
-    override suspend fun search(query: String): List<ShowWord> {
-        val networkWords = try {
-            Log.i("TAG", "search: ")
-            withContext(Dispatchers.IO) {
-                Log.i("TAG", "search, api key: ${BuildConfig.API_KEY}")
+//    override var searchWords: List<ShowWord> = emptyList()
+    override suspend fun search(query: String): Result<List<ShowWord>> {
+        Timber.d("使用 API KEY：${BuildConfig.API_KEY}")
+        return try {
+            Timber.d("開始搜尋單字：$query")
+
+            val networkResponse = withContext(Dispatchers.IO) {
                 dictionaryApiService.searchWords(word = query)
             }
+
+            val groupedWords = networkResponse
+                .toExternal()
+                .groupBy { it.wordId.substringBefore(":") }
+                .map { (uid, words) -> ShowWord(uid = uid, words = words) }
+
+            Result.Success(groupedWords)
+        } catch (e: IOException) {
+            // 網路錯誤（例如沒連線）
+            Result.Error("請檢查網路連線")
+        } catch (e: HttpException) {
+            // 伺服器錯誤
+            Result.Error("伺服器錯誤 (${e.code()})")
         } catch (e: Exception) {
-            Log.d("TAG", "search: $e")
-            emptyList()
+            // 其他錯誤，例如 JSON 解析錯誤
+            Result.Error("未知錯誤：${e.localizedMessage}")
         }
-        networkWords.forEachIndexed { index, networkWord ->
-            Log.i("TAG", "search, definitions${index}: ${networkWord.def}")
-            networkWord.def.forEach { de ->
-                Log.i("TAG", "search, definition, de.sseq: ${de.sseq}: ")
-            }
-        }
-        searchWords = networkWords.toExternal()
-            .groupBy { word -> word.wordId.substringBefore(":") }
-            .map { (uid, words) ->
-                ShowWord(
-                    uid = uid,
-                    words = words
-                )
-            }
-        return networkWords.toExternal()
-            .groupBy { word -> word.wordId.substringBefore(":") }
-            .map { (uid, words) ->
-                ShowWord(
-                    uid = uid,
-                    words = words
-                )
-            }
     }
 
     // Local
@@ -95,7 +95,7 @@ class WordRepositoryImpl @Inject constructor(
                 wordDao.insertWords(words = words.toLocal())
             }
         } catch (e: Exception) {
-            Log.d("TAG", "saveWord: $e")
+            Timber.d("saveWord: $e")
         }
     }
 
@@ -114,10 +114,10 @@ class WordRepositoryImpl @Inject constructor(
             try {
                 withContext(Dispatchers.IO) {
                     wordDao.insertWords(words = words.toLocal())
-                    Log.i("Room", "saveAllWords: Success save word")
+                    Timber.d("saveAllWords: Success save word")
                 }
             } catch (e: Exception) {
-                Log.i("Room", "saveAllWords: Failure save word, and $e")
+                Timber.d("saveAllWords: Failure save word, and $e")
             }
 
         }
@@ -127,19 +127,19 @@ class WordRepositoryImpl @Inject constructor(
         return flow {
             val haveWordsFromLocal = haveWordsInLocal()
             if (!haveWordsFromLocal) {
-                Log.i("Room", "fetchAllWordsToLocal: Room is empty")
+                Timber.d("fetchAllWordsToLocal: Room is empty")
                 try {
                     if (!userUid.isNullOrEmpty()) {
                         val showWords = fetchAllWordFromFirestore(userUid)
                         saveAllWordsToLocal(showWords)
                     } else {
-                        Log.i("Room", "fetchAllWordsToLocal: userUid is empty")
+                        Timber.d("fetchAllWordsToLocal: userUid is empty")
                     }
                 } catch (e: Exception) {
-                    Log.d("Room", "fetchAllWordsToLocal: getAllWords: $e")
+                    Timber.d("fetchAllWordsToLocal: getAllWords: $e")
                 }
             }
-            Log.i("Room", "fetchAllWordsToLocal: Room is not empty")
+            Timber.d("fetchAllWordsToLocal: Room is not empty")
             // 直接監聽 Room，轉換數據格式
             emitAll(
                 wordDao.getAllWords().map { localWords ->
@@ -156,7 +156,7 @@ class WordRepositoryImpl @Inject constructor(
         }
             .flowOn(Dispatchers.IO)
             .catch { e ->
-                Log.d("TAG", "fetchAllWordsToLocal: Error processing data: $e")
+                Timber.d("fetchAllWordsToLocal: Error processing data: $e")
                 emit(emptyList())
             }
     }
@@ -177,7 +177,7 @@ class WordRepositoryImpl @Inject constructor(
                 wordDao.deleteWords(words = words.toLocal())
             }
         } catch (e: Exception) {
-            Log.d("TAG", "deleteWord: $e")
+            Timber.d("deleteWord: $e")
         }
     }
 
@@ -197,7 +197,7 @@ class WordRepositoryImpl @Inject constructor(
                 wordDao.isWordExist(id = words[0].toLocal().id)
             }
         } catch (e: Exception) {
-            Log.d("TAG", "isWordExist: $e")
+            Timber.d("isWordExist: $e")
             false
         }
         return isExist
@@ -207,10 +207,10 @@ class WordRepositoryImpl @Inject constructor(
         try {
             withContext(Dispatchers.IO) {
                 wordDao.deleteAllWords()
-                Log.i("Room", "deleteAllWords: Success delete all words")
+                Timber.d("deleteAllWords: Success delete all words")
             }
         } catch (e: Exception) {
-            Log.i("Room", "deleteAllWords: Failure delete all words, and $e")
+            Timber.d("deleteAllWords: Failure delete all words, and $e")
         }
     }
 
@@ -218,11 +218,11 @@ class WordRepositoryImpl @Inject constructor(
         return try {
             withContext(Dispatchers.IO) {
                 val hasWords = wordDao.hasWords()
-                Log.i("Room", "hasWords: Success $hasWords")
+                Timber.d("hasWords: Success $hasWords")
                 hasWords
             }
         } catch (e: Exception) {
-            Log.i("Room", "hasWords: Failure $e")
+            Timber.d("hasWords: Failure $e")
             false
         }
     }
@@ -231,7 +231,8 @@ class WordRepositoryImpl @Inject constructor(
         return try {
             withContext(Dispatchers.IO) {
                 if (!userUid.isNullOrEmpty()) {
-                    wordsFirestoreService.fetchAllWordFromFirestore(userUid = userUid).toExternal()
+                    wordsFirestoreService.fetchAllWordFromFirestore(userUid = userUid)
+                        .toExternal()
                         .groupBy { word -> word.wordId.substringBefore(":") }
                         .map { (uid, words) ->
                             ShowWord(
@@ -240,12 +241,12 @@ class WordRepositoryImpl @Inject constructor(
                             )
                         }
                 } else {
-                    Log.i("repository", "fetchAllWordFromFirestore: userUid is empty")
+                    Timber.d("fetchAllWordFromFirestore: userUid is empty")
                     emptyList()
                 }
             }
         } catch (e: Exception) {
-            Log.d("repository", "getFirestoreWord: $e")
+            Timber.d("getFirestoreWord: $e")
             emptyList()
         }
     }
@@ -259,11 +260,11 @@ class WordRepositoryImpl @Inject constructor(
                 if (!userUid.isNullOrEmpty()) {
                     wordsFirestoreService.saveWordToFirestore(firestoreWords, userUid)
                 } else {
-                    Log.i("repository", "addFirestoreWords: userUid is empty")
+                    Timber.d("addFirestoreWords: userUid is empty")
                 }
             }
         } catch (e: Exception) {
-            Log.d("repository", "addFirestoreWords: $e")
+            Timber.d("addFirestoreWords: $e")
         }
 
     }
@@ -277,11 +278,11 @@ class WordRepositoryImpl @Inject constructor(
                 if (!userUid.isNullOrEmpty()) {
                     wordsFirestoreService.deleteWordForFirestore(firestoreWords, userUid)
                 } else {
-                    Log.i("repository", "deleteFirestoreWords: userUid is empty")
+                    Timber.d("deleteFirestoreWords: userUid is empty")
                 }
             }
         } catch (e: Exception) {
-            Log.d("repository", "deleteFirestoreWords: $e")
+            Timber.d("deleteFirestoreWords: $e")
         }
     }
 }

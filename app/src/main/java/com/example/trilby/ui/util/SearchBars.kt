@@ -1,6 +1,5 @@
 package com.example.trilby.ui.util
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,15 +34,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.trilby.ui.screens.dictionary.DictionaryViewModel
+import timber.log.Timber
 
 @Composable
 fun TrilbySearchBar(
-    viewModel: DictionaryViewModel = hiltViewModel(),
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onSearch: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Log.d("TAG", "TrilbySearchBar ViewModel: ${viewModel.hashCode()}")
     val focusManager = LocalFocusManager.current
     val focusRequester = FocusRequester()
     var isFocused by remember { mutableStateOf(false) }
@@ -73,7 +72,7 @@ fun TrilbySearchBar(
                         .weight(1f)
                         .padding(start = 8.dp)
                 ) {
-                    if (viewModel.searchQuery.isEmpty()) {
+                    if (query.isEmpty()) {
                         Text(
                             text = "Search",
                             color = Color.Gray,
@@ -81,14 +80,8 @@ fun TrilbySearchBar(
                         )
                     }
                     BasicTextField(
-                        value = viewModel.searchQuery,
-                        onValueChange = { newValue ->
-                            // text = newValue
-                            viewModel.changeSearchQuery(newValue)
-                            Log.i("TAG", "正在搜尋(正在輸入): $newValue")
-                            // viewModel.search()
-                            // Log.d("TAG", "TrilbySearchBar, : ${trilbyAppUiState.words}")
-                        },
+                        value = query,
+                        onValueChange = onQueryChange,
                         singleLine = true,
                         textStyle = TextStyle(
                             color = Color.Black,
@@ -100,8 +93,8 @@ fun TrilbySearchBar(
                         ),
                         keyboardActions = KeyboardActions(
                             onSearch = {
-                                viewModel.search(viewModel.searchQuery)
-                                Log.i("TAG", "正在搜尋: ${viewModel.searchQuery}")
+                                onSearch(query)
+                                Timber.d("正在搜尋: ${query}")
                                 focusManager.clearFocus()
                                 isFocused = false
                             }
@@ -136,6 +129,8 @@ fun TrilbySearchBar(
 @Composable
 private fun TrilbySearchBarPreview() {
     TrilbySearchBar(
-        viewModel = hiltViewModel()
+        query = "",
+        onQueryChange = {},
+        onSearch = {}
     )
 }
