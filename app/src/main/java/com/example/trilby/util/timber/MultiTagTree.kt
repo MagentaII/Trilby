@@ -1,4 +1,4 @@
-package com.example.trilby.helper.timber
+package com.example.trilby.util.timber
 
 import timber.log.Timber
 

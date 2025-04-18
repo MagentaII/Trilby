@@ -1,6 +1,6 @@
 package com.example.trilby
 
-import com.example.trilby.helper.timber.MultiTagTree
+import com.example.trilby.util.timber.MultiTagTree
 import android.app.Application
 import android.content.Context
 import androidx.datastore.core.DataStore

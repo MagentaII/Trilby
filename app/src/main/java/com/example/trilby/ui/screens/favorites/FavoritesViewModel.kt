@@ -19,6 +19,7 @@ import javax.inject.Inject
 data class FavoritesUiState(
     val savedWords: List<ShowWord> = emptyList(),
     val isLoading: Boolean = false,
+    val errorMessage: String? = null,
 )
 
 @HiltViewModel
