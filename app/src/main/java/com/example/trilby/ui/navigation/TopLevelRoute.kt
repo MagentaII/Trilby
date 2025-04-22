@@ -11,12 +11,13 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.serialization.Serializable
+import kotlin.reflect.KClass
 
 
 sealed class Route {
 
     @Serializable
-    data object InApp: Route()
+    data object InApp : Route()
 
     @Serializable
     data object Dictionary : Route()
@@ -36,48 +37,80 @@ sealed class Route {
     ) : Route()
 
     @Serializable
-    data object Login: Route()
+    data object Login : Route()
 
     @Serializable
-    data object Register: Route()
+    data object Register : Route()
 
     @Serializable
     data object EditProfile : Route()
 
     @Serializable
-    data object Splash: Route()
+    data object Splash : Route()
 }
 
-data class TopLevelRoute(
-    val name: String,
-    val route: Route,
+enum class TopLevelDestination(
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
-)
-
-val topLevelRoutes = listOf(
-    TopLevelRoute(
-        name = "Dictionary",
-        route = Route.Dictionary,
+    val iconTextId: String,
+    val route: KClass<*>,
+) {
+    Dictionary(
         selectedIcon = Icons.AutoMirrored.Filled.MenuBook,
         unselectedIcon = Icons.Outlined.Book,
+        iconTextId = "Dictionary",
+        route = Route.Dictionary::class,
     ),
-    TopLevelRoute(
-        name = "Favorites",
-        route = Route.Favorites,
+    Favorites(
         selectedIcon = Icons.Filled.Star,
         unselectedIcon = Icons.Outlined.StarOutline,
+        iconTextId = "Favorites",
+        route = Route.Favorites::class,
     ),
-    TopLevelRoute(
-        name = "Practice",
-        route = Route.Practice,
+    Practice(
         selectedIcon = Icons.Filled.EditNote,
         unselectedIcon = Icons.Outlined.Edit,
+        iconTextId = "Practice",
+        route = Route.Practice::class,
     ),
-    TopLevelRoute(
-        name = "Profile",
-        route = Route.Profile,
+    Profile(
         selectedIcon = Icons.Filled.Person,
         unselectedIcon = Icons.Outlined.Person,
+        iconTextId = "Profile",
+        route = Route.Profile::class,
     ),
-)
+}
+
+//data class TopLevelRoute(
+//    val name: String,
+//    val route: Route,
+//    val selectedIcon: ImageVector,
+//    val unselectedIcon: ImageVector,
+//)
+//
+//val topLevelRoutes = listOf(
+//    TopLevelRoute(
+//        name = "Dictionary",
+//        route = Route.Dictionary,
+//        selectedIcon = Icons.AutoMirrored.Filled.MenuBook,
+//        unselectedIcon = Icons.Outlined.Book,
+//    ),
+//    TopLevelRoute(
+//        name = "Favorites",
+//        route = Route.Favorites,
+//        selectedIcon = Icons.Filled.Star,
+//        unselectedIcon = Icons.Outlined.StarOutline,
+//    ),
+//    TopLevelRoute(
+//        name = "Practice",
+//        route = Route.Practice,
+//        selectedIcon = Icons.Filled.EditNote,
+//        unselectedIcon = Icons.Outlined.Edit,
+//    ),
+//    TopLevelRoute(
+//        name = "Profile",
+//        route = Route.Profile,
+//        selectedIcon = Icons.Filled.Person,
+//        unselectedIcon = Icons.Outlined.Person,
+//    ),
+//)
