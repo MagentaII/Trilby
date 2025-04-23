@@ -1,6 +1,5 @@
 package com.example.trilby.ui.screens.word_detail
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +21,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,44 +33,92 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.trilby.data.repositories.word_repository.ShowWord
-import com.example.trilby.data.repositories.word_repository.Word
 import com.example.trilby.data.repositories.word_repository.WordPrs
-import com.example.trilby.data.repositories.word_repository.WordSound
-import com.example.trilby.ui.navigation.Route
 import com.example.trilby.ui.util.DetailTopAppBar
+import timber.log.Timber
 
 @Composable
 fun WordDetailView(
-    wordDetail: Route.WordDetail,
-    words: List<ShowWord>,
-    onPopBack: () -> Unit,
+//    wordDetail: Route.WordDetail,
+//    words: List<ShowWord>,
+//    onPopBack: () -> Unit,
+    onBackClick: () -> Unit,
     viewModel: WordDetailViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
 
     val wordDetailUiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val selectedWord = words.find { it.uid == wordDetail.uid }
+//    val selectedWord = words.find { it.uid == wordDetail.uid }
+//    val selectedWord = ShowWord.empty
 
-    viewModel.isWordExist(selectedWord ?: ShowWord.empty)
+//    viewModel.isWordExist(selectedWord ?: ShowWord.empty)
 
+    when(val state = wordDetailUiState) {
+        is WordDetailUiState.Loading -> {
+            Timber.d("UI state is loading")
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                LinearProgressIndicator(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.secondary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
+            }
+        }
+        is WordDetailUiState.Error -> {
+            Timber.d("UI state error message: ${state.errorMessage}")
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = state.errorMessage ?: "發生錯誤",
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+        is WordDetailUiState.Success -> {
+            WordDetailScreen(
+                selectedWord = state.word,
+                onBackClick = onBackClick,
+                viewModel = viewModel
+            )
+        }
+    }
+}
+
+@Composable
+internal fun WordDetailScreen(
+    selectedWord: ShowWord?,
+    onBackClick: () -> Unit,
+    viewModel: WordDetailViewModel,
+    modifier: Modifier = Modifier
+) {
     Scaffold(
         topBar = {
             DetailTopAppBar(
                 title = selectedWord?.uid ?: "Error",
-                onPopBack = onPopBack,
-                saveWord = {
-                    viewModel.saveWord(word = selectedWord ?: ShowWord.empty)
-                },
-                deleteWord = {
-                    viewModel.deleteWord(word = selectedWord ?: ShowWord.empty)
-                },
-                isSaveWord = wordDetailUiState.isFavorite,
+                onPopBack = onBackClick,
+                saveWord = {},
+//                    {
+//                    viewModel.saveWord(word = selectedWord ?: ShowWord.empty)
+//                },
+                deleteWord = {},
+//                    {
+//                    viewModel.deleteWord(word = selectedWord ?: ShowWord.empty)
+//                },
+//                isSaveWord = wordDetailUiState.isFavorite,
+                isSaveWord = false
             )
         }
     ) { innerPadding ->
@@ -81,7 +130,7 @@ fun WordDetailView(
                 .padding(horizontal = 8.dp, vertical = 28.dp)
         ) {
             // Header Section
-            Log.i("TAG", "WordDetailView, headwords: $selectedWord")
+            Timber.d("WordDetailView, headwords: $selectedWord")
             HeaderSection(
                 word = selectedWord?.uid ?: "Error"
             )
@@ -110,7 +159,7 @@ fun WordDetailView(
 }
 
 @Composable
-fun HeaderSection(
+internal fun HeaderSection(
     word: String
 ) {
     Row(
@@ -128,7 +177,7 @@ fun HeaderSection(
 }
 
 @Composable
-fun WordDetailsSection(
+internal fun WordDetailsSection(
     viewModel: WordDetailViewModel,
     label: String,
     prs: List<WordPrs>?,
@@ -178,7 +227,7 @@ fun WordDetailsSection(
 }
 
 @Composable
-fun DefinitionRow(index: Int, definition: String) {
+internal fun DefinitionRow(index: Int, definition: String) {
     val splitDefinition = definition.split("\n")
 
     Row {
@@ -220,7 +269,7 @@ fun DefinitionRow(index: Int, definition: String) {
 }
 
 @Composable
-fun PronunciationAndSound(
+internal fun PronunciationAndSound(
     viewModel: WordDetailViewModel,
     wordPrs: WordPrs,
 ) {
@@ -245,46 +294,46 @@ fun PronunciationAndSound(
     }
 }
 
-@Preview(showBackground = true, device = "spec:width=392.7dp,height=1500dp,dpi=440")
-@Composable
-private fun WordDetailViewPreview() {
-    val fakeWords = listOf(
-        ShowWord(
-            uid = "book",
-            words = listOf(
-                Word(
-                    wordId = "book:1",
-                    headword = "book",
-                    wordPrs = listOf(
-                        WordPrs(
-                            mw = "ˈbu̇k",
-                            sound = WordSound(
-                                audio = "book0001",
-                                ref = "c",
-                                stat = "1",
-                                subdirectory = "b"
-                            )
-                        )
-                    ),
-                    label = "noun",
-                    shortDef = listOf(
-                        "a set of written sheets of skin or paper or tablets of wood or ivory",
-                        "a set of written, printed, or blank sheets bound together between a front and back cover",
-                        "a long written or printed literary composition"
-                    ),
-                    wordUuid = "836e81f2-f89e-40b8-b67c-e664c4c17a54"
-                )
-            )
-        )
-    )
-
-    val wordDetail = Route.WordDetail(
-        uid = "book"
-    )
-
-    WordDetailView(
-        wordDetail = wordDetail,
-        words = fakeWords,
-        onPopBack = {},
-    )
-}
+//@Preview(showBackground = true, device = "spec:width=392.7dp,height=1500dp,dpi=440")
+//@Composable
+//private fun WordDetailViewPreview() {
+//    val fakeWords = listOf(
+//        ShowWord(
+//            uid = "book",
+//            words = listOf(
+//                Word(
+//                    wordId = "book:1",
+//                    headword = "book",
+//                    wordPrs = listOf(
+//                        WordPrs(
+//                            mw = "ˈbu̇k",
+//                            sound = WordSound(
+//                                audio = "book0001",
+//                                ref = "c",
+//                                stat = "1",
+//                                subdirectory = "b"
+//                            )
+//                        )
+//                    ),
+//                    label = "noun",
+//                    shortDef = listOf(
+//                        "a set of written sheets of skin or paper or tablets of wood or ivory",
+//                        "a set of written, printed, or blank sheets bound together between a front and back cover",
+//                        "a long written or printed literary composition"
+//                    ),
+//                    wordUuid = "836e81f2-f89e-40b8-b67c-e664c4c17a54"
+//                )
+//            )
+//        )
+//    )
+//
+//    val wordDetail = Route.WordDetail(
+//        uid = "book"
+//    )
+//
+//    WordDetailView(
+//        wordDetail = wordDetail,
+//        words = fakeWords,
+//        onPopBack = {},
+//    )
+//}

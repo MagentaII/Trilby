@@ -14,21 +14,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
-import com.example.trilby.ui.navigation.TrilbyNavHost
+import com.example.trilby.navigation.TrilbyNavHost
 import com.example.trilby.ui.theme.TrilbyTheme
 import kotlin.reflect.KClass
 
 @Composable
-fun TrilbyApp(
-//    viewModel: TrilbyAppViewModel = hiltViewModel(),
-) {
+fun TrilbyApp() {
     // AppState
     val appState = rememberTrilbyAppState()
     // Navigation
-//    val navController = rememberNavController()
     val navController = appState.navController
-//    val navBackStackEntry by navController.currentBackStackEntryAsState()
-//    val currentDestination = navBackStackEntry?.destination
     val currentDestination = appState.currentDestination
     Scaffold(
         bottomBar = {
@@ -38,7 +33,7 @@ fun TrilbyApp(
                     containerColor = Color(0xFF7988A9),
                 ) {
                     appState.topLevelDestination.forEach { destination ->
-                        val selected = currentDestination.isRouteInHierarchy(destination.route)
+                        val selected = currentDestination.isRouteInHierarchy(destination.baseRoute)
 
                         NavigationBarItem(
                             selected = selected,

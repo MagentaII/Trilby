@@ -94,7 +94,7 @@ fun TrilbySearchBar(
                         keyboardActions = KeyboardActions(
                             onSearch = {
                                 onSearch(query)
-                                Timber.d("正在搜尋: ${query}")
+                                Timber.d("正在搜尋: $query")
                                 focusManager.clearFocus()
                                 isFocused = false
                             }

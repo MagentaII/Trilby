@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -24,7 +26,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,22 +47,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.trilby.ui.navigation.Route
 import com.example.trilby.ui.util.ProfileTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileView(
     viewModel: ProfileViewModel = hiltViewModel(),
-    onNavigateToEditProfile: (route: Route) -> Unit,
-    onNavigateToLogin: (route: Route) -> Unit,
-    onNavigateToRegister: (route: Route) -> Unit,
+//    onNavigateToEditProfile: (route: Route) -> Unit,
+    onEditProfileClick: () -> Unit,
+//    onNavigateToLogin: (route: Route) -> Unit,
+    onLoginClick: () -> Unit,
+//    onNavigateToRegister: (route: Route) -> Unit,
+    onRegisterClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val profileUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState()
     var showDialog by remember { mutableStateOf(false) }
     val isLoading = profileUiState.isLoading
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     LaunchedEffect(profileUiState.showBottomSheet) {
         if (profileUiState.showBottomSheet) {
@@ -107,11 +115,14 @@ fun ProfileView(
     }
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             ProfileTopAppBar(
-                showBottomSheet = { viewModel.showBottomSheet() },
-                onNavigateToEditProfile = onNavigateToEditProfile,
                 hasUser = profileUiState.currentUser != null,
+                showBottomSheet = { viewModel.showBottomSheet() },
+//                onNavigateToEditProfile = onNavigateToEditProfile,
+                onEditProfileClick = onEditProfileClick,
+                scrollBehavior = scrollBehavior
             )
         }
     ) { innerPadding ->
@@ -128,6 +139,7 @@ fun ProfileView(
             Column(
                 modifier = modifier
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
                     .padding(innerPadding)
                     .padding(horizontal = 20.dp)
             ) {
@@ -157,8 +169,8 @@ fun ProfileView(
                     ProfileContentAfterSignIn()
                 } else {
                     ProfileContentBeforeSignIn(
-                        onNavigateToLogin = onNavigateToLogin,
-                        onNavigateToRegister = onNavigateToRegister,
+                        onLoginClick = onLoginClick,
+                        onRegisterClick = onRegisterClick,
                     )
                 }
             }
@@ -298,8 +310,8 @@ fun ProfileContentAfterSignIn(
 
 @Composable
 fun ProfileContentBeforeSignIn(
-    onNavigateToLogin: (route: Route) -> Unit,
-    onNavigateToRegister: (route: Route) -> Unit,
+    onLoginClick: () -> Unit,
+    onRegisterClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column {
@@ -322,7 +334,7 @@ fun ProfileContentBeforeSignIn(
             Column {
                 OutlinedButton(
                     onClick = {
-                        onNavigateToRegister(Route.Register)
+                        onRegisterClick()
                     },
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.outlinedButtonColors().copy(
@@ -349,7 +361,7 @@ fun ProfileContentBeforeSignIn(
 
                 OutlinedButton(
                     onClick = {
-                        onNavigateToLogin(Route.Login)
+                        onLoginClick()
                     },
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.outlinedButtonColors().copy(
@@ -469,9 +481,12 @@ fun ShowSignOutDialog(
 @Composable
 private fun ProfileViewPreview() {
     ProfileView(
-        onNavigateToEditProfile = {},
-        onNavigateToLogin = {},
-        onNavigateToRegister = {}
+//        onNavigateToEditProfile = {},
+        onEditProfileClick = {},
+//        onNavigateToLogin = {},
+        onLoginClick = {},
+//        onNavigateToRegister = {}
+        onRegisterClick = {},
     )
 }
 
@@ -479,8 +494,8 @@ private fun ProfileViewPreview() {
 @Composable
 private fun ProfileContentBeforeSignInPreview() {
     ProfileContentBeforeSignIn(
-        onNavigateToLogin = {},
-        onNavigateToRegister = {}
+        onLoginClick = {},
+        onRegisterClick = {}
     )
 }
 

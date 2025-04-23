@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.trilby.ui.navigation.TopLevelDestination
+import com.example.trilby.navigation.TopLevelDestination
 
 @Composable
 fun TrilbyBottomNavigationBar(

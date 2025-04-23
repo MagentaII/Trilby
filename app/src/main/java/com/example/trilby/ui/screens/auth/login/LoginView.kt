@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.trilby.R
-import com.example.trilby.ui.navigation.Route
 import com.example.trilby.ui.util.AuthTopAppBar
 import com.example.trilby.ui.util.SocialIconButton
 
@@ -37,14 +36,14 @@ import com.example.trilby.ui.util.SocialIconButton
 @Composable
 fun LoginView(
     viewModel: LoginViewModel = hiltViewModel(),
-    onNavigateBack: () -> Unit,
-    onSignInNavigate: (route: Route) -> Unit,
+    onBackClick: () -> Unit,
+//    onSignInNavigate: (route: Route) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         topBar = {
             AuthTopAppBar(
-                onCancelClick = onNavigateBack
+                onCancelClick = onBackClick
             )
         },
         containerColor = Color(0xFF7988A9)
@@ -65,7 +64,7 @@ fun LoginView(
                         .fillMaxSize()
                         .padding(horizontal = 32.dp)
                 ) {
-                    Spacer(Modifier.height(32.dp))
+                    Spacer(Modifier.height(16.dp))
                     Text(
                         text = "Login to your Account",
                         style = TextStyle(
@@ -74,15 +73,15 @@ fun LoginView(
                             color = Color.White
                         )
                     )
-                    Spacer(Modifier.height(24.dp))
+                    Spacer(Modifier.height(8.dp))
 
                     // Email 輸入框
                     CustomOutlinedTextField(viewModel = viewModel, label = "Email")
-                    Spacer(Modifier.height(24.dp))
+                    Spacer(Modifier.height(8.dp))
 
                     // Password 輸入框
                     CustomOutlinedTextField(viewModel = viewModel, label = "Password")
-                    Spacer(Modifier.height(32.dp))
+                    Spacer(Modifier.height(16.dp))
 
                     // 第三方登入區塊
                     Box(
@@ -93,13 +92,13 @@ fun LoginView(
                             Text(
                                 text = "- Or sign in with -",
                                 style = TextStyle(
-                                    fontSize = 20.sp,
+                                    fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium,
                                     color = Color.White
                                 )
                             )
 
-                            Spacer(Modifier.height(24.dp))
+                            Spacer(Modifier.height(16.dp))
                             Row(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 modifier = Modifier.fillMaxWidth()
@@ -129,7 +128,7 @@ fun LoginView(
                         // 登入按鈕
                         Button(
                             onClick = {
-                                viewModel.onSignInClick(onSignInNavigate)
+//                                viewModel.onSignInClick(onSignInNavigate)
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                         ) {
@@ -199,7 +198,7 @@ fun CustomOutlinedTextField(
 @Composable
 private fun LoginViewPreview() {
     LoginView(
-        onNavigateBack = {},
-        onSignInNavigate = {}
+        onBackClick = {},
+//        onSignInNavigate = {}
     )
 }

@@ -11,12 +11,15 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import com.example.trilby.ui.navigation.Route
-import com.example.trilby.ui.navigation.TopLevelDestination
-import com.example.trilby.ui.navigation.TopLevelDestination.Dictionary
-import com.example.trilby.ui.navigation.TopLevelDestination.Favorites
-import com.example.trilby.ui.navigation.TopLevelDestination.Practice
-import com.example.trilby.ui.navigation.TopLevelDestination.Profile
+import com.example.trilby.navigation.TopLevelDestination
+import com.example.trilby.navigation.TopLevelDestination.Dictionary
+import com.example.trilby.navigation.TopLevelDestination.Favorites
+import com.example.trilby.navigation.TopLevelDestination.Practice
+import com.example.trilby.navigation.TopLevelDestination.Profile
+import com.example.trilby.ui.screens.dictionary.navigation.navigateToDictionary
+import com.example.trilby.ui.screens.favorites.navigation.navigateToFavorites
+import com.example.trilby.ui.screens.practice.navigation.navigateToPractice
+import com.example.trilby.ui.screens.profile.navigation.navigateToProfile
 
 @Composable
 fun rememberTrilbyAppState(
@@ -73,10 +76,10 @@ class TrilbyAppState(
         }
 
         when (topLevelDestination) {
-            Dictionary -> navController.navigate(Route.Dictionary, topLevelNavOption)
-            Favorites -> navController.navigate(Route.Favorites, topLevelNavOption)
-            Practice -> navController.navigate(Route.Practice, topLevelNavOption)
-            Profile -> navController.navigate(Route.Profile, topLevelNavOption)
+            Dictionary -> navController.navigateToDictionary(topLevelNavOption)
+            Favorites -> navController.navigateToFavorites(topLevelNavOption)
+            Practice -> navController.navigateToPractice(topLevelNavOption)
+            Profile -> navController.navigateToProfile(topLevelNavOption)
         }
     }
 }

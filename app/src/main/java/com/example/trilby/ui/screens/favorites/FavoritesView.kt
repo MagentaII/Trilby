@@ -8,32 +8,30 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.trilby.data.repositories.word_repository.ShowWord
-import com.example.trilby.ui.navigation.Route
 import com.example.trilby.ui.util.DefaultTopAppBar
 import com.example.trilby.ui.util.WordCard
 
 @Composable
 fun FavoritesView(
     viewModel: FavoritesViewModel = hiltViewModel(),
-    onUpdateSharedWords: (List<ShowWord>) -> Unit,
-    onNavigateToDetail: (route: Route) -> Unit,
+//    onUpdateSharedWords: (List<ShowWord>) -> Unit,
+//    onNavigateToDetail: (route: Route) -> Unit,
+    onItemClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val favoritesUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val words = favoritesUiState.savedWords
     val isLoading = favoritesUiState.isLoading
 
-    LaunchedEffect(words) {
-        onUpdateSharedWords(words)
-    }
+//    LaunchedEffect(words) {
+//        onUpdateSharedWords(words)
+//    }
 
     Scaffold(
         topBar = {
@@ -58,7 +56,7 @@ fun FavoritesView(
                     .padding(innerPadding)
             ) {
                 items(words) { word ->
-                    WordCard(word, onNavigateToDetail = onNavigateToDetail)
+                    WordCard(word, onItemClick = onItemClick)
                 }
             }
         }
@@ -69,7 +67,8 @@ fun FavoritesView(
 @Composable
 private fun FavoritesPreview() {
     FavoritesView(
-        onUpdateSharedWords = {},
-        onNavigateToDetail = {},
+        onItemClick = {}
+//        onUpdateSharedWords = {},
+//        onNavigateToDetail = {},
     )
 }

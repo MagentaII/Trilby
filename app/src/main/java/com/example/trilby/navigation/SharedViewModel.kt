@@ -1,4 +1,4 @@
-package com.example.trilby.ui.navigation
+package com.example.trilby.navigation
 
 import androidx.lifecycle.ViewModel
 import com.example.trilby.data.repositories.word_repository.ShowWord

@@ -25,8 +25,10 @@ sealed class Result<out T> {
 
 interface WordRepository {
     // Network
-//    var searchWords: List<ShowWord>
-    suspend fun search(query: String): Result<List<ShowWord>>
+    var words: List<ShowWord>
+//    suspend fun search(query: String): Result<List<ShowWord>>
+    fun searchWords(query: String): Flow<List<ShowWord>>
+    fun getWordById(wordId: String): Flow<ShowWord>;
 
     // Local
     suspend fun saveWordToLocal(showWord: ShowWord)
@@ -50,32 +52,57 @@ class WordRepositoryImpl @Inject constructor(
 ) : WordRepository {
 
     // Network
+    override var words: List<ShowWord> = emptyList()
 //    override var searchWords: List<ShowWord> = emptyList()
-    override suspend fun search(query: String): Result<List<ShowWord>> {
-        Timber.d("使用 API KEY：${BuildConfig.API_KEY}")
-        return try {
-            Timber.d("開始搜尋單字：$query")
+//    override suspend fun search(query: String): Result<List<ShowWord>> {
+//        Timber.d("使用 API KEY：${BuildConfig.API_KEY}")
+//        return try {
+//            Timber.d("開始搜尋單字：$query")
+//
+//            val networkResponse = withContext(Dispatchers.IO) {
+//                dictionaryApiService.searchWords(word = query)
+//            }
+//
+//            val groupedWords = networkResponse
+//                .toExternal()
+//                .groupBy { it.wordId.substringBefore(":") }
+//                .map { (uid, words) -> ShowWord(uid = uid, words = words) }
+//
+//            Result.Success(groupedWords)
+//        } catch (e: IOException) {
+//            // 網路錯誤（例如沒連線）
+//            Result.Error("請檢查網路連線")
+//        } catch (e: HttpException) {
+//            // 伺服器錯誤
+//            Result.Error("伺服器錯誤 (${e.code()})")
+//        } catch (e: Exception) {
+//            // 其他錯誤，例如 JSON 解析錯誤
+//            Result.Error("未知錯誤：${e.localizedMessage}")
+//        }
+//    }
 
-            val networkResponse = withContext(Dispatchers.IO) {
-                dictionaryApiService.searchWords(word = query)
-            }
+    override fun searchWords(query: String): Flow<List<ShowWord>> = flow<List<ShowWord>> {
+        Timber.d("開始搜尋單字: $query")
+        val response = dictionaryApiService.searchWords(word = query).toExternal()
+        val grouped = response.groupBy { it.wordId.substringBefore(":") }
+            .map { (uid, words) -> ShowWord(uid = uid, words = words) }
+        words = grouped
+        emit(grouped)
+    }.catch { e ->
+        Timber.e(e, "搜尋單字失敗")
+        emit(emptyList())
+    }.flowOn(Dispatchers.IO)
 
-            val groupedWords = networkResponse
-                .toExternal()
-                .groupBy { it.wordId.substringBefore(":") }
-                .map { (uid, words) -> ShowWord(uid = uid, words = words) }
-
-            Result.Success(groupedWords)
-        } catch (e: IOException) {
-            // 網路錯誤（例如沒連線）
-            Result.Error("請檢查網路連線")
-        } catch (e: HttpException) {
-            // 伺服器錯誤
-            Result.Error("伺服器錯誤 (${e.code()})")
-        } catch (e: Exception) {
-            // 其他錯誤，例如 JSON 解析錯誤
-            Result.Error("未知錯誤：${e.localizedMessage}")
+    override fun getWordById(wordId: String): Flow<ShowWord> = flow {
+        val word = words.find { it.uid == wordId }
+        if (word != null) {
+            emit(word)
+        } else {
+            throw NoSuchElementException("找不到對應單字：$wordId")
         }
+    }.catch { e ->
+        Timber.e(e, "獲取單字失敗")
+        emit(ShowWord.empty)
     }
 
     // Local

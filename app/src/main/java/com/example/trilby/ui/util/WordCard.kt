@@ -1,6 +1,5 @@
 package com.example.trilby.ui.util
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,12 +16,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.trilby.data.repositories.word_repository.ShowWord
-import com.example.trilby.ui.navigation.Route
+import timber.log.Timber
 
 @Composable
 fun WordCard(
     word: ShowWord,
-    onNavigateToDetail: (route: Route) -> Unit,
+//    onNavigateToDetail: (route: Route) -> Unit,
+    onItemClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -31,13 +31,14 @@ fun WordCard(
         colors = CardDefaults.cardColors().copy(containerColor = Color.White),
         shape = RectangleShape,
         border = BorderStroke(1.dp, Color.LightGray),
-        onClick = {
-            onNavigateToDetail(
-                Route.WordDetail(
-                    uid = word.uid,
-                ),
-            )
-        },
+        onClick = {onItemClick(word.uid)}
+//        onClick = {
+//            onNavigateToDetail(
+//                Route.WordDetail(
+//                    uid = word.uid,
+//                ),
+//            )
+//        },
     ) {
         Text(
             text = word.uid,
@@ -55,33 +56,14 @@ private fun WordCardView() {
         uid = "book",
         words = emptyList()
     )
-//    val defaultWord = ShowWord(
-//        uid = "book",
-//        wordId = listOf("book:1", "book:2", "book:3"),
-//        headword = listOf("book", "book", "book"),
-//        label = listOf("noun", "adjective", "verb"),
-//        definition = listOf(
-//            listOf(
-//                "a set of written sheets of skin or paper or tablets of wood or ivory",
-//                "a set of written, printed, or blank sheets bound together between a front and back cover",
-//                "a long written or printed literary composition",
-//            ),
-//            listOf(
-//                "derived from books and not from practical experience",
-//                "shown by ledgers"
-//            ),
-//            listOf(
-//                "to register (something, such as a name) for some future activity or condition (as to engage transportation or reserve lodgings)",
-//                "to schedule engagements for",
-//                "to set aside time for"
-//            )
-//        )
-//    )
 
     WordCard(
         defaultWord,
-        onNavigateToDetail = { route ->
-            Log.i("TAG", "WordCardView, route, name: $route")
+        onItemClick = { id ->
+            Timber.d("WordCardView, id: $id")
         }
+//        onNavigateToDetail = { route ->
+//            Log.i("TAG", "WordCardView, route, name: $route")
+//        }
     )
 }

@@ -25,6 +25,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,10 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.trilby.R
-import com.example.trilby.ui.navigation.Route
-import com.example.trilby.ui.screens.dictionary.DictionaryViewModel
 import com.example.trilby.ui.theme.TrilbyTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,7 +51,7 @@ fun DefaultTopAppBar(
     Column(
         modifier = modifier
             .background(Color(0xFF7988A9))
-            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+            .padding(start = 16.dp, end = 16.dp)
     ) {
         CenterAlignedTopAppBar(
             title = {
@@ -85,7 +83,7 @@ fun AuthTopAppBar(
     Column(
         modifier = modifier
             .background(Color(0xFF3C4A68))
-            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+            .padding(start = 16.dp, end = 16.dp)
     ) {
         CenterAlignedTopAppBar(
             title = {
@@ -127,18 +125,18 @@ fun AuthTopAppBar(
 fun ProfileTopAppBar(
     hasUser: Boolean,
     showBottomSheet: () -> Unit,
-    onNavigateToEditProfile: (route: Route) -> Unit,
+//    onNavigateToEditProfile: (route: Route) -
+    onEditProfileClick: () -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior,
     modifier: Modifier = Modifier
 ) {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+//    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     Box {
         Column {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF7988A9))
-                    .padding(top = 16.dp)
             ) {
                 LargeTopAppBar(
                     title = { },
@@ -172,8 +170,11 @@ fun ProfileTopAppBar(
             ) {
                 if (hasUser) {
                     OutlinedButton(
+//                        onClick = {
+//                            onNavigateToEditProfile(Route.EditProfile)
+//                        },
                         onClick = {
-                            onNavigateToEditProfile(Route.EditProfile)
+                            onEditProfileClick()
                         },
                         contentPadding = PaddingValues(horizontal = 20.dp)
                     ) {
@@ -209,7 +210,7 @@ fun EditProfileTopAppBar(
     Column(
         modifier = modifier
             .background(Color(0xFF3C4A68))
-            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+            .padding(start = 16.dp, end = 16.dp)
     ) {
         CenterAlignedTopAppBar(
             title = {
@@ -271,7 +272,7 @@ fun AddSearchBarTopAppBar(
     Column(
         modifier = modifier
             .background(Color(0xFF7988A9))
-            .padding(top = 16.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
+            .padding(bottom = 12.dp, start = 16.dp, end = 16.dp),
     ) {
         CenterAlignedTopAppBar(
             title = {
@@ -310,7 +311,7 @@ fun DetailTopAppBar(
     Column(
         modifier = modifier
             .background(Color(0xFF7988A9))
-            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+            .padding(start = 16.dp, end = 16.dp)
     ) {
         CenterAlignedTopAppBar(
             title = {
@@ -396,15 +397,18 @@ private fun AuthTopAppBarPreview() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 private fun ProfileTopAppBarPreview() {
     TrilbyTheme {
         Surface {
             ProfileTopAppBar(
+                hasUser = true,
                 showBottomSheet = {},
-                onNavigateToEditProfile = {},
-                hasUser = true
+//                onNavigateToEditProfile = {},
+                onEditProfileClick = {},
+                scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
             )
         }
     }

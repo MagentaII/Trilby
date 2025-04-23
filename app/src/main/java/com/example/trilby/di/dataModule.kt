@@ -1,4 +1,4 @@
-package com.example.trilby.data.di
+package com.example.trilby.di
 
 import android.content.Context
 import androidx.media3.exoplayer.ExoPlayer
