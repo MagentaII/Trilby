@@ -1,57 +1,78 @@
 package com.example.trilby.ui
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavDestination.Companion.hierarchy
 import com.example.trilby.ui.navigation.TrilbyNavHost
 import com.example.trilby.ui.theme.TrilbyTheme
-import com.example.trilby.ui.util.TrilbyBottomNavigationBar
+import kotlin.reflect.KClass
 
 @Composable
 fun TrilbyApp(
-    viewModel: TrilbyAppViewModel = hiltViewModel(),
+//    viewModel: TrilbyAppViewModel = hiltViewModel(),
 ) {
+    // AppState
+    val appState = rememberTrilbyAppState()
     // Navigation
-    val navController = rememberNavController()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
-
+//    val navController = rememberNavController()
+    val navController = appState.navController
+//    val navBackStackEntry by navController.currentBackStackEntryAsState()
+//    val currentDestination = navBackStackEntry?.destination
+    val currentDestination = appState.currentDestination
     Scaffold(
         bottomBar = {
-            if (currentDestination?.route in listOf(
-                    "com.example.trilby.ui.navigation.Route.Dictionary",
-                    "com.example.trilby.ui.navigation.Route.Profile",
-                    "com.example.trilby.ui.navigation.Route.Practice",
-                    "com.example.trilby.ui.navigation.Route.Favorites",
-                )
-            ) {
-                TrilbyBottomNavigationBar(
-                    currentDestination = currentDestination,
-                    onNavigation = { route ->
-                        navController.navigate(route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
+            val currentTopLevelDestination = appState.currentTopLevelDestination
+            if (currentTopLevelDestination != null)
+                NavigationBar(
+                    containerColor = Color(0xFF7988A9),
+                ) {
+                    appState.topLevelDestination.forEach { destination ->
+                        val selected = currentDestination.isRouteInHierarchy(destination.route)
+
+                        NavigationBarItem(
+                            selected = selected,
+                            onClick = { appState.navigateToTopLevelDestination(destination) },
+                            icon = {
+                                Icon(
+                                    imageVector = if (selected) destination.selectedIcon else destination.unselectedIcon,
+                                    contentDescription = null
+                                )
+                            },
+                            label = { Text(destination.iconTextId) },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = Color(0xFFFCEFBC),
+                                unselectedIconColor = Color(0xFFFFFFFF),
+                                selectedTextColor = Color(0xFFFCEFBC),
+                                unselectedTextColor = Color(0xFFFFFFFF),
+                                indicatorColor = Color.Transparent,
+                            )
+                        )
                     }
-                )
-            }
-        },
+                }
+        }
     ) { innerPadding ->
         TrilbyNavHost(
             navController = navController,
             modifier = Modifier.padding(innerPadding),
         )
     }
+}
+
+private fun NavDestination?.isRouteInHierarchy(route: KClass<*>): Boolean {
+    return this?.hierarchy?.any {
+        it.hasRoute(route)
+    } ?: false
 }
 
 @Preview
