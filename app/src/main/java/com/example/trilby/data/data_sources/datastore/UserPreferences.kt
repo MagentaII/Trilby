@@ -1,4 +1,4 @@
-package com.example.trilby.data.sources.local
+package com.example.trilby.data.data_sources.datastore
 
 import android.content.Context
 import androidx.datastore.core.DataStore

@@ -1,4 +1,4 @@
-package com.example.trilby.data.sources.network.word_firestore_network_source
+package com.example.trilby.data.data_sources.firebase.model
 
 data class FirestoreWord(
     val uuid: String = "",

@@ -1,6 +1,6 @@
-package com.example.trilby.data.repositories.auth_repository
+package com.example.trilby.data.data_sources.firebase.model
 
-data class User(
+data class FbUser(
     val uid: String = "",
     val name: String = "",
     val email: String = "",

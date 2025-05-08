@@ -1,10 +1,13 @@
 package com.example.trilby.data.repositories.word_repository
 
-import android.util.Log
-import com.example.trilby.BuildConfig
-import com.example.trilby.data.sources.local.WordDao
-import com.example.trilby.data.sources.network.word_api_network_source.DictionaryApiService
-import com.example.trilby.data.sources.network.word_firestore_network_source.WordsFirestoreService
+import com.example.trilby.data.data_sources.database.dao.WordDao
+import com.example.trilby.data.data_sources.firebase.WordFirebaseDataSource
+import com.example.trilby.data.data_sources.network.WordNetworkDataSource
+import com.example.trilby.data.repositories.word_repository.model.ShowWord
+import com.example.trilby.data.repositories.word_repository.model.Word
+import com.example.trilby.data.repositories.word_repository.util.toExternal
+import com.example.trilby.data.repositories.word_repository.util.toFirestore
+import com.example.trilby.data.repositories.word_repository.util.toLocal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -13,77 +16,21 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import retrofit2.HttpException
 import timber.log.Timber
-import java.io.IOException
 import javax.inject.Inject
 
-sealed class Result<out T> {
-    data class Success<T>(val data: T) : Result<T>()
-    data class Error(val errorMessage: String) : Result<Nothing>()
-}
-
-interface WordRepository {
-    // Network
-    var words: List<ShowWord>
-//    suspend fun search(query: String): Result<List<ShowWord>>
-    fun searchWords(query: String): Flow<List<ShowWord>>
-    fun getWordById(wordId: String): Flow<ShowWord>;
-
-    // Local
-    suspend fun saveWordToLocal(showWord: ShowWord)
-    suspend fun saveAllWordsToLocal(showWords: List<ShowWord>)
-    fun fetchAllWordsToLocal(userUid: String?): Flow<List<ShowWord>>
-    suspend fun deleteWordForLocal(word: ShowWord)
-    suspend fun isWordExistInLocal(word: ShowWord): Boolean
-    suspend fun deleteAllWordsForLocal()
-    suspend fun haveWordsInLocal(): Boolean
-
-    // firestore
-    suspend fun fetchAllWordFromFirestore(userUid: String?): List<ShowWord>
-    suspend fun saveWordToFirestore(showWord: ShowWord, userUid: String?)
-    suspend fun deleteWordForFirestore(showWord: ShowWord, userUid: String?)
-}
-
-class WordRepositoryImpl @Inject constructor(
-    private val dictionaryApiService: DictionaryApiService,
+class DefaultWordRepository @Inject constructor(
+    private val wordNetworkDataSource: WordNetworkDataSource,
     private val wordDao: WordDao,
-    private val wordsFirestoreService: WordsFirestoreService,
+    private val wordsFirestoreService: WordFirebaseDataSource,
 ) : WordRepository {
 
     // Network
     override var words: List<ShowWord> = emptyList()
-//    override var searchWords: List<ShowWord> = emptyList()
-//    override suspend fun search(query: String): Result<List<ShowWord>> {
-//        Timber.d("使用 API KEY：${BuildConfig.API_KEY}")
-//        return try {
-//            Timber.d("開始搜尋單字：$query")
-//
-//            val networkResponse = withContext(Dispatchers.IO) {
-//                dictionaryApiService.searchWords(word = query)
-//            }
-//
-//            val groupedWords = networkResponse
-//                .toExternal()
-//                .groupBy { it.wordId.substringBefore(":") }
-//                .map { (uid, words) -> ShowWord(uid = uid, words = words) }
-//
-//            Result.Success(groupedWords)
-//        } catch (e: IOException) {
-//            // 網路錯誤（例如沒連線）
-//            Result.Error("請檢查網路連線")
-//        } catch (e: HttpException) {
-//            // 伺服器錯誤
-//            Result.Error("伺服器錯誤 (${e.code()})")
-//        } catch (e: Exception) {
-//            // 其他錯誤，例如 JSON 解析錯誤
-//            Result.Error("未知錯誤：${e.localizedMessage}")
-//        }
-//    }
 
     override fun searchWords(query: String): Flow<List<ShowWord>> = flow<List<ShowWord>> {
         Timber.d("開始搜尋單字: $query")
-        val response = dictionaryApiService.searchWords(word = query).toExternal()
+        val response = wordNetworkDataSource.getWordList(query = query).toExternal()
         val grouped = response.groupBy { it.wordId.substringBefore(":") }
             .map { (uid, words) -> ShowWord(uid = uid, words = words) }
         words = grouped

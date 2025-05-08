@@ -1,4 +1,4 @@
-package com.example.trilby.data.sources.network.word_api_network_source
+package com.example.trilby.data.data_sources.network.model
 
 data class NetworkWord(
     val meta: Meta,

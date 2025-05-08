@@ -1,21 +1,24 @@
-package com.example.trilby.data.repositories.word_repository
+package com.example.trilby.data.repositories.word_repository.util
 
-import com.example.trilby.data.sources.local.LocalWord
-import com.example.trilby.data.sources.local.LocalWordPrs
-import com.example.trilby.data.sources.local.LocalWordSound
-import com.example.trilby.data.sources.network.word_api_network_source.NetworkWord
-import com.example.trilby.data.sources.network.word_api_network_source.Prs
-import com.example.trilby.data.sources.network.word_api_network_source.Sound
-import com.example.trilby.data.sources.network.word_firestore_network_source.FirestoreHwi
-import com.example.trilby.data.sources.network.word_firestore_network_source.FirestorePrs
-import com.example.trilby.data.sources.network.word_firestore_network_source.FirestoreSound
-import com.example.trilby.data.sources.network.word_firestore_network_source.FirestoreWord
+import com.example.trilby.data.data_sources.database.model.WordEntity
+import com.example.trilby.data.data_sources.database.model.LocalWordPrs
+import com.example.trilby.data.data_sources.database.model.LocalWordSound
+import com.example.trilby.data.data_sources.network.model.NetworkWord
+import com.example.trilby.data.data_sources.network.model.Prs
+import com.example.trilby.data.data_sources.network.model.Sound
+import com.example.trilby.data.data_sources.firebase.model.FirestoreHwi
+import com.example.trilby.data.data_sources.firebase.model.FirestorePrs
+import com.example.trilby.data.data_sources.firebase.model.FirestoreSound
+import com.example.trilby.data.data_sources.firebase.model.FirestoreWord
+import com.example.trilby.data.repositories.word_repository.model.Word
+import com.example.trilby.data.repositories.word_repository.model.WordPrs
+import com.example.trilby.data.repositories.word_repository.model.WordSound
 import com.google.gson.Gson
 
 /**
  * External to Local
  */
-fun Word.toLocal() = LocalWord(
+fun Word.toLocal() = WordEntity(
     id = wordId,
     headword = headword,
     wordPrs = wordPrs?.toLocalWordPrsAsJson(),
@@ -40,12 +43,12 @@ fun List<WordPrs>.toLocalWordPrsAsJson(): List<String> = map {
 }
 
 @JvmName("ExternalToLocal")
-fun List<Word>.toLocal(): List<LocalWord> = map(Word::toLocal)
+fun List<Word>.toLocal(): List<WordEntity> = map(Word::toLocal)
 
 /**
  * Local to External
  */
-fun LocalWord.toExternal(): Word {
+fun WordEntity.toExternal(): Word {
     val gson = Gson()
     val wordPrsList = wordPrs?.map { jsonString ->
         gson.fromJson(jsonString, WordPrs::class.java)
@@ -61,7 +64,7 @@ fun LocalWord.toExternal(): Word {
 }
 
 @JvmName("LocalToExternal")
-fun List<LocalWord>.toExternal(): List<Word> = map(LocalWord::toExternal)
+fun List<WordEntity>.toExternal(): List<Word> = map(WordEntity::toExternal)
 
 /**
  * Network to External

@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import com.example.trilby.data.repositories.auth_repository.AuthRepository
-import com.example.trilby.data.repositories.word_repository.ShowWord
-import com.example.trilby.data.repositories.word_repository.WordPrs
+import com.example.trilby.data.repositories.word_repository.model.ShowWord
+import com.example.trilby.data.repositories.word_repository.model.WordPrs
 import com.example.trilby.data.repositories.word_repository.WordRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory

@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.trilby.data.repositories.word_repository.ShowWord
+import com.example.trilby.data.repositories.word_repository.model.ShowWord
 import timber.log.Timber
 
 @Composable

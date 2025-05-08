@@ -1,7 +1,7 @@
 package com.example.trilby.navigation
 
 import androidx.lifecycle.ViewModel
-import com.example.trilby.data.repositories.word_repository.ShowWord
+import com.example.trilby.data.repositories.word_repository.model.ShowWord
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

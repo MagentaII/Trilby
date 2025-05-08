@@ -1,4 +1,4 @@
-package com.example.trilby.data.repositories.word_repository
+package com.example.trilby.data.repositories.word_repository.model
 
 
 data class ShowWord(

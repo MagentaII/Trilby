@@ -4,16 +4,19 @@ import android.content.Context
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.room.Room
 import com.example.trilby.data.repositories.auth_repository.AuthRepository
-import com.example.trilby.data.repositories.auth_repository.AuthRepositoryImpl
+import com.example.trilby.data.repositories.auth_repository.DefaultAuthRepository
 import com.example.trilby.data.repositories.word_repository.WordRepository
-import com.example.trilby.data.repositories.word_repository.WordRepositoryImpl
-import com.example.trilby.data.sources.local.AppDatabase
-import com.example.trilby.data.sources.local.WordDao
-import com.example.trilby.data.sources.network.auth_network_source.AuthService
-import com.example.trilby.data.sources.network.auth_network_source.AuthServiceImpl
-import com.example.trilby.data.sources.network.word_api_network_source.DictionaryApiService
-import com.example.trilby.data.sources.network.word_firestore_network_source.WordsFirestoreService
-import com.example.trilby.data.sources.network.word_firestore_network_source.WordsFirestoreServiceImpl
+import com.example.trilby.data.repositories.word_repository.DefaultWordRepository
+import com.example.trilby.data.data_sources.database.AppDatabase
+import com.example.trilby.data.data_sources.database.dao.WordDao
+import com.example.trilby.data.data_sources.firebase.UserFirebaseDataSource
+import com.example.trilby.data.data_sources.firebase.WordFirebaseDataSource
+import com.example.trilby.data.data_sources.firebase.auth.FirebaseUserAuth
+import com.example.trilby.data.data_sources.firebase.firestore.FirebaseWordFirestore
+
+import com.example.trilby.data.data_sources.network.WordNetworkDataSource
+import com.example.trilby.data.data_sources.network.retrofit.RetrofitWordNetwork
+import com.example.trilby.data.data_sources.network.retrofit.RetrofitWordNetworkApi
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -37,13 +40,13 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindWordRepository(
-        wordRepositoryImpl: WordRepositoryImpl
+        wordRepositoryImpl: DefaultWordRepository
     ): WordRepository
 
     @Singleton
     @Binds
     abstract fun bindAuthRepository(
-        authRepositoryImpl: AuthRepositoryImpl
+        authRepositoryImpl: DefaultAuthRepository
     ): AuthRepository
 }
 
@@ -52,14 +55,27 @@ abstract class RepositoryModule {
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    @Singleton
     @Provides
-    fun provideDictionaryApiService(): DictionaryApiService {
+    @Singleton
+    fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(DictionaryApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWordNetworkApi(retrofit: Retrofit): RetrofitWordNetworkApi {
+        return retrofit.create(RetrofitWordNetworkApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWordNetworkDataSource(
+        networkApi: RetrofitWordNetworkApi
+    ): WordNetworkDataSource {
+        return RetrofitWordNetwork(networkApi)
     }
 }
 
@@ -68,17 +84,21 @@ object NetworkModule {
 @InstallIn(SingletonComponent::class)
 object LocalStorageModule {
 
-    @Singleton
     @Provides
-    fun provideWordDao(@ApplicationContext context: Context): WordDao {
+    @Singleton
+    fun provideWordDatabase(
+        @ApplicationContext context: Context
+    ): AppDatabase {
         return Room.databaseBuilder(
             context.applicationContext,
             AppDatabase::class.java,
             "word_database"
-        )
-            .addMigrations(AppDatabase.MIGRATION_1_2)
-            .build()
-            .wordDao()
+        ).build()
+    }
+
+    @Provides
+    fun provideWordDao(database: AppDatabase): WordDao {
+        return database.wordDao()
     }
 }
 
@@ -87,24 +107,20 @@ object LocalStorageModule {
 @InstallIn(SingletonComponent::class)
 object FirebaseModule {
 
-    @Singleton
     @Provides
-    fun provideFirebaseAuth(): FirebaseAuth {
-        return Firebase.auth
-    }
+    @Singleton
+    fun provideFirebaseAuth(): FirebaseAuth = Firebase.auth
 
-    @Singleton
     @Provides
-    fun provideFirebase(): Firebase {
-        return Firebase // 假設你有封裝 Firebase
-    }
+    @Singleton
+    fun provideFirebase(): Firebase = Firebase // 如果你有自定封裝
 
-    @Singleton
     @Provides
-    fun provideWordsFirestoreDataSource(
+    @Singleton
+    fun provideWordFirestoreDataSource(
         firebase: Firebase
-    ): WordsFirestoreService {
-        return WordsFirestoreServiceImpl(firebase)
+    ): WordFirebaseDataSource {
+        return FirebaseWordFirestore(firebase)
     }
 }
 
@@ -116,8 +132,8 @@ abstract class ServiceModule {
     @Singleton
     @Binds
     abstract fun bindAuthService(
-        authServiceImpl: AuthServiceImpl
-    ): AuthService
+        authServiceImpl: FirebaseUserAuth
+    ): UserFirebaseDataSource
 }
 
 // 6. 工具模組（例如 ExoPlayer）

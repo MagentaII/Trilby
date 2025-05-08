@@ -38,8 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.trilby.data.repositories.word_repository.ShowWord
-import com.example.trilby.data.repositories.word_repository.WordPrs
+import com.example.trilby.data.repositories.word_repository.model.ShowWord
+import com.example.trilby.data.repositories.word_repository.model.WordPrs
 import com.example.trilby.ui.util.DetailTopAppBar
 import timber.log.Timber
 

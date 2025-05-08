@@ -1,6 +1,7 @@
-package com.example.trilby.data.sources.network.auth_network_source
+package com.example.trilby.data.data_sources.firebase.auth
 
 import android.util.Log
+import com.example.trilby.data.data_sources.firebase.UserFirebaseDataSource
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -15,21 +16,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-
-interface AuthService {
-    fun currentUser(): Flow<FirebaseUser?>
-    fun getCurrentUserUid(): Flow<String?>
-    suspend fun getUserInformation(uid: String?): NetworkUser?
-    fun hasUser(): Boolean
-    suspend fun signIn(email: String, password: String): Result<Boolean>
-    suspend fun signUp(name: String, email: String, password: String): Result<Boolean>
-    suspend fun signOut()
-}
-
-class AuthServiceImpl @Inject constructor(
+class FirebaseUserAuth @Inject constructor(
     private val auth: FirebaseAuth,
     private val firebase: Firebase,
-) : AuthService {
+) : UserFirebaseDataSource {
 
     private val _currentUserFlow = MutableStateFlow(auth.currentUser)
     val currentUserFlow: StateFlow<FirebaseUser?> = _currentUserFlow.asStateFlow()
@@ -50,7 +40,7 @@ class AuthServiceImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUserInformation(uid: String?): NetworkUser? {
+    override suspend fun getUserInformation(uid: String?): com.example.trilby.data.data_sources.firebase.model.FbUser? {
         val db = firebase.firestore
         return try {
             if (uid != null) {
@@ -58,7 +48,7 @@ class AuthServiceImpl @Inject constructor(
                 val document = db.collection("users").document(uid).get().await()
                 if (document.exists()) {
                     Log.i("Firestore", "getUserInformation: ${document.exists()}")
-                    document.toObject<NetworkUser>()
+                    document.toObject<com.example.trilby.data.data_sources.firebase.model.FbUser>()
                 } else {
                     Log.i("Firestore", "getUserInformation: document no exists ")
                     null
@@ -119,3 +109,4 @@ class AuthServiceImpl @Inject constructor(
         auth.signOut()
     }
 }
+

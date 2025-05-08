@@ -1,6 +1,8 @@
-package com.example.trilby.data.sources.network.word_firestore_network_source
+package com.example.trilby.data.data_sources.firebase.firestore
 
 import android.util.Log
+import com.example.trilby.data.data_sources.firebase.WordFirebaseDataSource
+import com.example.trilby.data.data_sources.firebase.model.FirestoreWord
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
@@ -8,15 +10,9 @@ import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-interface WordsFirestoreService {
-    suspend fun saveWordToFirestore(words: List<FirestoreWord>, userUid: String?)
-    suspend fun fetchAllWordFromFirestore(userUid: String?): List<FirestoreWord>
-    suspend fun deleteWordForFirestore(words: List<FirestoreWord>, userUid: String?)
-}
-
-class WordsFirestoreServiceImpl @Inject constructor(
+class FirebaseWordFirestore @Inject constructor(
     private val firebase: Firebase
-) : WordsFirestoreService {
+) : WordFirebaseDataSource {
 
     override suspend fun saveWordToFirestore(words: List<FirestoreWord>, userUid: String?) {
         Log.d("Firestore", "addWord: $words")

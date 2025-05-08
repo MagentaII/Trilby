@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trilby.data.repositories.auth_repository.AuthRepository
-import com.example.trilby.data.repositories.auth_repository.User
+import com.example.trilby.data.repositories.auth_repository.model.User
 import com.example.trilby.data.repositories.word_repository.WordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

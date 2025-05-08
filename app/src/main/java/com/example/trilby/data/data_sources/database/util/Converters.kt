@@ -1,8 +1,9 @@
-package com.example.trilby.data.sources.local
+package com.example.trilby.data.data_sources.database.util
 
 
 import android.util.Log
 import androidx.room.TypeConverter
+import com.example.trilby.data.data_sources.database.model.LocalWordPrs
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
