@@ -43,17 +43,15 @@ fun DictionaryView(
             AddSearchBarTopAppBar(
                 title = "Dictionary",
                 query = viewModel.searchQuery,
-                onQueryChange = { query ->
+                onValueChange = { query ->
                     viewModel.changeSearchQuery(query)
                 },
-                onSearch = { query ->
-                    viewModel.searchWords(query)
-                }
+                onSearch = { viewModel.searchWords() }
             )
         },
     ) { innerPadding ->
 
-        when(val state = dictionaryUiState) {
+        when (val state = dictionaryUiState) {
             is DictionaryUiState.Loading -> {
                 Timber.d("UI state is loading")
                 Box(
@@ -69,6 +67,7 @@ fun DictionaryView(
                     )
                 }
             }
+
             is DictionaryUiState.Success -> {
                 LazyColumn(
                     modifier = modifier.padding(innerPadding)
@@ -78,6 +77,7 @@ fun DictionaryView(
                     }
                 }
             }
+
             is DictionaryUiState.Error -> {
                 Timber.d("UI state error message: ${state.errorMessage}")
                 Box(
@@ -86,7 +86,7 @@ fun DictionaryView(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = state.errorMessage ?: "發生錯誤",
+                        text = state.errorMessage,
                         textAlign = TextAlign.Center
                     )
                 }

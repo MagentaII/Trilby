@@ -15,10 +15,10 @@ interface AuthRepository {
     // Firebase
     fun currentUser(): Flow<FirebaseUser?>
     fun getCurrentUserUid(): Flow<String?>
-    suspend fun getUserInformation(uid: String?): User?
+    fun getUserInformation(uid: String?): Flow<User?>
     fun hasUser(): Boolean
-    suspend fun signIn(email: String, password: String): Result<Boolean>
-    suspend fun signUp(name: String, email: String, password: String): Result<Boolean>
+    fun signIn(email: String, password: String): Flow<Boolean>
+    fun signUp(name: String, email: String, password: String): Flow<Boolean>
     suspend fun signOut()
 
     // DataStore

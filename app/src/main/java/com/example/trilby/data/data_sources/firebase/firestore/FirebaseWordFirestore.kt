@@ -1,6 +1,5 @@
 package com.example.trilby.data.data_sources.firebase.firestore
 
-import android.util.Log
 import com.example.trilby.data.data_sources.firebase.WordFirebaseDataSource
 import com.example.trilby.data.data_sources.firebase.model.FirestoreWord
 import com.google.firebase.Firebase
@@ -8,14 +7,14 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 import javax.inject.Inject
 
 class FirebaseWordFirestore @Inject constructor(
     private val firebase: Firebase
 ) : WordFirebaseDataSource {
 
-    override suspend fun saveWordToFirestore(words: List<FirestoreWord>, userUid: String?) {
-        Log.d("Firestore", "addWord: $words")
+    override suspend fun insertWord(words: List<FirestoreWord>, userUid: String?) {
         val db = firebase.firestore
         val wordIds = mutableListOf<String>()
         try {
@@ -27,12 +26,9 @@ class FirebaseWordFirestore @Inject constructor(
                             .document(word.id)
                             .set(word)
                             .await()
-                        Log.i("Firestore", "saveWordToFirestore, words, Success: ${word.id}")
+                        Timber.i("Firebase單字儲存成功: ${word.id}")
                     } else {
-                        Log.i(
-                            "Firestore",
-                            "saveWordToFirestore, word has been exist in words: ${word.id}"
-                        )
+                        Timber.i("不儲存，Firebase單字已存在: ${word.id}")
                     }
                     wordIds.add(word.id)
                 }
@@ -42,46 +38,33 @@ class FirebaseWordFirestore @Inject constructor(
                     .await()
                 if (documentSnapshot.exists()) {
                     val wordIdsFromFirestore = documentSnapshot.get("wordIds") as List<String>
-                    Log.i(
-                        "Firestore",
-                        "saveWordToFirestore, wordIdsFromFirestore: $wordIdsFromFirestore"
-                    )
 
                     if (!wordIdsFromFirestore.containsAll(wordIds)) {
                         db.collection("user_words")
                             .document(userUid)
                             .update("wordIds", FieldValue.arrayUnion(*wordIds.toTypedArray()))
                             .await()
-                        Log.i(
-                            "Firestore",
-                            "saveWordToFirestore, user_words, Success: $userUid"
-                        )
+                        Timber.i("Firebase user_words 更新成功: $userUid")
                     } else {
-                        Log.i(
-                            "Firestore",
-                            "saveWordToFirestore, word's id has been exist in user_words: $userUid, and ${wordIds[0]}"
-                        )
+                        Timber.i("不更新，Firebase user_words 已存在: $userUid")
                     }
                 } else {
                     db.collection("user_words")
                         .document(userUid)
                         .set(mapOf("wordIds" to wordIds))
                         .await()
-                    Log.i(
-                        "Firestore",
-                        "saveWordToFirestore, user_words, Success: $userUid"
-                    )
+                    Timber.i("Firebase user_words 儲存成功: $userUid")
                 }
             } else {
-                Log.e("Firestore", "saveWordToFirestore, Failure: userUid is null or empty")
+                Timber.e("Firebase單字儲存失敗: userUid is null or empty")
             }
         } catch (e: Exception) {
-            Log.e("Firestore", "saveWordToFirestore, Failure: $e")
+            Timber.e("Firebase單字儲存失敗: $e")
         }
     }
 
 
-    override suspend fun fetchAllWordFromFirestore(userUid: String?): List<FirestoreWord> {
+    override suspend fun getAllWords(userUid: String?): List<FirestoreWord> {
         val db = firebase.firestore
         val result = mutableListOf<FirestoreWord>()
         try {
@@ -107,7 +90,7 @@ class FirebaseWordFirestore @Inject constructor(
         return result
     }
 
-    override suspend fun deleteWordForFirestore(words: List<FirestoreWord>, userUid: String?) {
+    override suspend fun deleteWord(words: List<FirestoreWord>, userUid: String?) {
         val db = firebase.firestore
         try {
             if (!userUid.isNullOrEmpty()) {
@@ -117,12 +100,12 @@ class FirebaseWordFirestore @Inject constructor(
                         .update("wordIds", FieldValue.arrayRemove(word.id))
                         .await()
                 }
-                Log.i("Firestore", "deleteWordForFirestore, Success: $userUid")
+                Timber.i("Firebase單字刪除成功: $userUid")
             } else {
-                Log.e("Firestore", "deleteWordForFirestore, Failure: userUid is null or empty")
+                Timber.e("Firebase單字刪除失敗: userUid is null or empty")
             }
         } catch (e: Exception) {
-            Log.e("Firestore", "deleteWordForFirestore, Failure: $e")
+            Timber.e("Firebase單字刪除失敗: $e")
         }
     }
 }

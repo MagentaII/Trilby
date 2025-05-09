@@ -9,7 +9,7 @@ interface UserFirebaseDataSource {
     fun getCurrentUserUid(): Flow<String?>
     suspend fun getUserInformation(uid: String?): FbUser?
     fun hasUser(): Boolean
-    suspend fun signIn(email: String, password: String): Result<Boolean>
-    suspend fun signUp(name: String, email: String, password: String): Result<Boolean>
+    suspend fun signIn(email: String, password: String): Boolean
+    suspend fun signUp(name: String, email: String, password: String): Boolean
     suspend fun signOut()
 }

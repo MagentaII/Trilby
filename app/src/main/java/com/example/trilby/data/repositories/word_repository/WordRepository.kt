@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 //}
 
 interface WordRepository {
+    suspend fun searchWords(query: String)
     fun getWords(): Flow<List<ShowWord>>
     fun getWordById(id: String): Flow<ShowWord>
 

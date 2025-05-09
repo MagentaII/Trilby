@@ -67,22 +67,16 @@ class FirebaseUserAuth @Inject constructor(
         return auth.currentUser != null
     }
 
-    override suspend fun signIn(email: String, password: String): Result<Boolean> {
+    override suspend fun signIn(email: String, password: String): Boolean {
         return try {
             val result = auth.signInWithEmailAndPassword(email, password).await()
-            val userId = result.user?.uid
-
-            if (userId != null) {
-                Result.success(true)
-            } else {
-                Result.failure(Exception("User ID is null"))
-            }
+            result.user?.uid != null
         } catch (e: Exception) {
-            Result.failure(e)
+            false
         }
     }
 
-    override suspend fun signUp(name: String, email: String, password: String): Result<Boolean> {
+    override suspend fun signUp(name: String, email: String, password: String): Boolean {
         val db = firebase.firestore
         return try {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
@@ -96,12 +90,12 @@ class FirebaseUserAuth @Inject constructor(
                 )
 
                 db.collection("users").document(userId).set(user).await()
-                Result.success(true)
+                true
             } else {
-                Result.failure(Exception("User ID is null"))
+                false
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            false
         }
     }
 

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,7 +21,8 @@ class DictionaryViewModel @Inject constructor(
     private val wordRepository: WordRepository,
 ) : ViewModel() {
     // state
-    private val _uiState = MutableStateFlow<DictionaryUiState>(DictionaryUiState.Success(emptyList()))
+    private val _uiState =
+        MutableStateFlow<DictionaryUiState>(DictionaryUiState.Success(emptyList()))
     val uiState: StateFlow<DictionaryUiState> = _uiState.asStateFlow()
 
     var searchQuery by mutableStateOf("")
@@ -30,13 +32,14 @@ class DictionaryViewModel @Inject constructor(
         searchQuery = query
     }
 
-    fun searchWords(query: String) {
+    fun searchWords() {
         if (searchQuery.isBlank()) return
         viewModelScope.launch {
-            _uiState.value = DictionaryUiState.Loading
-            wordRepository.searchWords(query)
+            wordRepository.searchWords(searchQuery)
+            wordRepository.getWords()
+                .onStart { _uiState.value = DictionaryUiState.Loading }
                 .catch { e ->
-                    _uiState.value = DictionaryUiState.Error("發生錯誤: ${e.localizedMessage}")
+                    _uiState.value = DictionaryUiState.Error("搜尋單字失敗: ${e.localizedMessage}")
                 }
                 .collect { words ->
                     _uiState.value = DictionaryUiState.Success(words)

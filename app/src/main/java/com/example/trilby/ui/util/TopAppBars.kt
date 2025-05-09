@@ -264,8 +264,8 @@ fun EditProfileTopAppBar(
 fun AddSearchBarTopAppBar(
     title: String,
     query: String,
-    onQueryChange: (String) -> Unit,
-    onSearch: (String) -> Unit,
+    onValueChange: (String) -> Unit,
+    onSearch: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -290,7 +290,7 @@ fun AddSearchBarTopAppBar(
             scrollBehavior = scrollBehavior,
         )
         TrilbySearchBar(
-            onQueryChange = onQueryChange,
+            onValueChange = onValueChange,
             query = query,
             onSearch = onSearch
         )
@@ -301,10 +301,10 @@ fun AddSearchBarTopAppBar(
 @Composable
 fun DetailTopAppBar(
     title: String,
-    onPopBack: () -> Unit,
-    saveWord: () -> Unit,
-    deleteWord: () -> Unit,
-    isSaveWord: Boolean,
+    onBackClick: () -> Unit,
+    onSaveWord: () -> Unit,
+    onDeleteWord: () -> Unit,
+    isFavorite: Boolean,
     modifier: Modifier = Modifier
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -328,7 +328,7 @@ fun DetailTopAppBar(
             ),
             navigationIcon = {
                 IconButton(
-                    onClick = { onPopBack() },
+                    onClick = { onBackClick() },
                 ) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
@@ -342,14 +342,14 @@ fun DetailTopAppBar(
             actions = {
                 IconButton(
                     onClick = {
-                        if (isSaveWord) {
-                            deleteWord()
+                        if (isFavorite) {
+                            onDeleteWord()
                         } else {
-                            saveWord()
+                            onSaveWord()
                         }
                     },
                 ) {
-                    if (isSaveWord) {
+                    if (isFavorite) {
                         Icon(
                             Icons.Filled.Star,
                             contentDescription = "",
@@ -430,7 +430,7 @@ private fun AddSearchBarTopAppBarPreview() {
     AddSearchBarTopAppBar(
         title = "Dictionary",
         query = "",
-        onQueryChange = {},
+        onValueChange = {},
         onSearch = {}
     )
 }
@@ -442,10 +442,10 @@ private fun DetailTopAppBarPreview() {
         Surface {
             DetailTopAppBar(
                 title = "Apple",
-                onPopBack = {},
-                saveWord = {},
-                deleteWord = {},
-                isSaveWord = true,
+                onBackClick = {},
+                onSaveWord = {},
+                onDeleteWord = {},
+                isFavorite = true,
             )
         }
     }

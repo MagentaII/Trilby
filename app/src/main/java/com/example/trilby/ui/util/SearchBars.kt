@@ -39,8 +39,8 @@ import timber.log.Timber
 @Composable
 fun TrilbySearchBar(
     query: String,
-    onQueryChange: (String) -> Unit,
-    onSearch: (String) -> Unit,
+    onValueChange: (String) -> Unit,
+    onSearch: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
@@ -81,7 +81,7 @@ fun TrilbySearchBar(
                     }
                     BasicTextField(
                         value = query,
-                        onValueChange = onQueryChange,
+                        onValueChange = onValueChange,
                         singleLine = true,
                         textStyle = TextStyle(
                             color = Color.Black,
@@ -93,7 +93,7 @@ fun TrilbySearchBar(
                         ),
                         keyboardActions = KeyboardActions(
                             onSearch = {
-                                onSearch(query)
+                                onSearch()
                                 Timber.d("正在搜尋: $query")
                                 focusManager.clearFocus()
                                 isFocused = false
@@ -130,7 +130,7 @@ fun TrilbySearchBar(
 private fun TrilbySearchBarPreview() {
     TrilbySearchBar(
         query = "",
-        onQueryChange = {},
+        onValueChange = {},
         onSearch = {}
     )
 }

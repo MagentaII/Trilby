@@ -45,26 +45,18 @@ import timber.log.Timber
 
 @Composable
 fun WordDetailView(
-//    wordDetail: Route.WordDetail,
-//    words: List<ShowWord>,
-//    onPopBack: () -> Unit,
     onBackClick: () -> Unit,
     viewModel: WordDetailViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
 
     val wordDetailUiState by viewModel.uiState.collectAsStateWithLifecycle()
-//    val selectedWord = words.find { it.uid == wordDetail.uid }
-//    val selectedWord = ShowWord.empty
 
-//    viewModel.isWordExist(selectedWord ?: ShowWord.empty)
-
-    when(val state = wordDetailUiState) {
+    when (val state = wordDetailUiState) {
         is WordDetailUiState.Loading -> {
-            Timber.d("UI state is loading")
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxSize()
             ) {
                 LinearProgressIndicator(
@@ -74,10 +66,10 @@ fun WordDetailView(
                 )
             }
         }
+
         is WordDetailUiState.Error -> {
-            Timber.d("UI state error message: ${state.errorMessage}")
             Box(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
@@ -87,11 +79,16 @@ fun WordDetailView(
                 )
             }
         }
+
         is WordDetailUiState.Success -> {
             WordDetailScreen(
-                selectedWord = state.word,
+                word = state.word,
+                isFavorite = state.isFavorite,
                 onBackClick = onBackClick,
-                viewModel = viewModel
+                onPlayAudioClick = viewModel::playWordAudio,
+                onSaveWord = viewModel::saveWord,
+                onDeleteWord = viewModel::deleteWord,
+                modifier = modifier
             )
         }
     }
@@ -99,29 +96,25 @@ fun WordDetailView(
 
 @Composable
 internal fun WordDetailScreen(
-    selectedWord: ShowWord?,
+    word: ShowWord?,
+    isFavorite: Boolean,
+    onPlayAudioClick: (WordPrs) -> Unit,
     onBackClick: () -> Unit,
-    viewModel: WordDetailViewModel,
+    onSaveWord: () -> Unit,
+    onDeleteWord: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         topBar = {
             DetailTopAppBar(
-                title = selectedWord?.uid ?: "Error",
-                onPopBack = onBackClick,
-                saveWord = {},
-//                    {
-//                    viewModel.saveWord(word = selectedWord ?: ShowWord.empty)
-//                },
-                deleteWord = {},
-//                    {
-//                    viewModel.deleteWord(word = selectedWord ?: ShowWord.empty)
-//                },
-//                isSaveWord = wordDetailUiState.isFavorite,
-                isSaveWord = false
+                title = "Error",
+                onBackClick = onBackClick,
+                onSaveWord = onSaveWord,
+                onDeleteWord = onDeleteWord,
+                isFavorite = isFavorite
             )
         }
-    ) { innerPadding ->
+    ){ innerPadding ->
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -130,9 +123,9 @@ internal fun WordDetailScreen(
                 .padding(horizontal = 8.dp, vertical = 28.dp)
         ) {
             // Header Section
-            Timber.d("WordDetailView, headwords: $selectedWord")
+            Timber.d("WordDetailView, headwords: $word")
             HeaderSection(
-                word = selectedWord?.uid ?: "Error"
+                word = word?.uid ?: "Error"
             )
 
             Spacer(Modifier.height(14.dp))
@@ -144,18 +137,19 @@ internal fun WordDetailScreen(
                 color = Color(0xFFC3CFEA)
             )
 
-            selectedWord?.words?.forEach { word ->
+            word?.words?.forEach { word ->
                 Spacer(Modifier.height(14.dp))
                 // Word Details Section
                 WordDetailsSection(
-                    viewModel = viewModel,
                     label = word.label,
+                    onPlayAudioClick = onPlayAudioClick,
                     prs = word.wordPrs,
                     shortDef = word.shortDef
                 )
             }
         }
     }
+
 }
 
 @Composable
@@ -178,8 +172,8 @@ internal fun HeaderSection(
 
 @Composable
 internal fun WordDetailsSection(
-    viewModel: WordDetailViewModel,
     label: String,
+    onPlayAudioClick: (WordPrs) -> Unit,
     prs: List<WordPrs>?,
     shortDef: List<String>
 ) {
@@ -199,7 +193,7 @@ internal fun WordDetailsSection(
             if (pr.sound != null) {
                 Spacer(Modifier.width(16.dp))
                 PronunciationAndSound(
-                    viewModel = viewModel,
+                    onPlayAudioClick = onPlayAudioClick,
                     wordPrs = pr
                 )
             }
@@ -270,12 +264,12 @@ internal fun DefinitionRow(index: Int, definition: String) {
 
 @Composable
 internal fun PronunciationAndSound(
-    viewModel: WordDetailViewModel,
+    onPlayAudioClick: (WordPrs) -> Unit,
     wordPrs: WordPrs,
 ) {
     OutlinedButton(
         onClick = {
-            viewModel.playWordAudio(wordPrs)
+            onPlayAudioClick(wordPrs)
         }
     ) {
         Row(

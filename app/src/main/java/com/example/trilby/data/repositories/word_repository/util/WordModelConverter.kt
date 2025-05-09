@@ -10,6 +10,7 @@ import com.example.trilby.data.data_sources.firebase.model.FirestoreHwi
 import com.example.trilby.data.data_sources.firebase.model.FirestorePrs
 import com.example.trilby.data.data_sources.firebase.model.FirestoreSound
 import com.example.trilby.data.data_sources.firebase.model.FirestoreWord
+import com.example.trilby.data.repositories.word_repository.model.ShowWord
 import com.example.trilby.data.repositories.word_repository.model.Word
 import com.example.trilby.data.repositories.word_repository.model.WordPrs
 import com.example.trilby.data.repositories.word_repository.model.WordSound
@@ -18,6 +19,21 @@ import com.google.gson.Gson
 /**
  * External to Local
  */
+
+fun ShowWord.toLocal(): List<WordEntity> {
+    val words = List(this.words.size) { index ->
+        Word(
+            wordId = this.words[index].wordId,
+            wordUuid = this.words[index].wordUuid,
+            headword = this.words[index].headword,
+            wordPrs = this.words[index].wordPrs,
+            label = this.words[index].label,
+            shortDef = this.words[index].shortDef,
+        )
+    }
+    return words.toLocal()
+}
+
 fun Word.toLocal() = WordEntity(
     id = wordId,
     headword = headword,
@@ -78,6 +94,7 @@ fun NetworkWord.toExternal() = Word(
     shortDef = shortdef
 )
 
+
 fun Prs.toExternalPrs() = WordPrs(
     mw = mw,
     sound = sound?.toExternalSound()
@@ -93,8 +110,15 @@ fun Sound.toExternalSound() = WordSound(
 @JvmName("NetworkPrsToExternalPrs")
 fun List<Prs>.toExternalPrs(): List<WordPrs> = map(Prs::toExternalPrs)
 
+//@JvmName("NetworkToExternal")
+//fun List<NetworkWord>.toExternal(): List<Word> = map(NetworkWord::toExternal)
 @JvmName("NetworkToExternal")
-fun List<NetworkWord>.toExternal(): List<Word> = map(NetworkWord::toExternal)
+fun List<NetworkWord>.toExternal(): List<ShowWord> {
+    val wordList = this.map { it.toExternal() }
+    val showWordList = wordList.groupBy { it.wordId.substringBefore(":") }
+        .map { (uid, words) -> ShowWord(uid = uid, words = words) }
+    return showWordList
+}
 
 //fun NetworkWord.toLocal() = toExternal().toLocal()
 //fun List<NetworkWord>.toLocal(): List<LocalWord> = map(NetworkWord::toLocal)
@@ -132,6 +156,12 @@ fun List<FirestorePrs>.toExternalPrs(): List<WordPrs> = map(FirestorePrs::toExte
 /**
  * External to Firestore
  */
+
+fun ShowWord.toFirestore(): List<FirestoreWord> {
+    val firestoreWordList = this.words.map { it.toFirestore()}
+    return firestoreWordList
+}
+
 fun Word.toFirestore(): FirestoreWord {
     return FirestoreWord(
         fl = label,

@@ -5,10 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
-import com.example.trilby.data.repositories.auth_repository.AuthRepository
+import com.example.trilby.data.repositories.word_repository.WordRepository
 import com.example.trilby.data.repositories.word_repository.model.ShowWord
 import com.example.trilby.data.repositories.word_repository.model.WordPrs
-import com.example.trilby.data.repositories.word_repository.WordRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -19,15 +18,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
-
-//data class WordDetailUiState(
-//    val isFavorite: Boolean = false,
-//)
-
 @HiltViewModel(assistedFactory = WordDetailViewModel.Factory::class)
 class WordDetailViewModel @AssistedInject constructor(
     private val wordRepository: WordRepository,
-    private val authRepository: AuthRepository,
     private val exoPlayer: ExoPlayer,
     @Assisted val wordId: String
 ) : ViewModel() {
@@ -47,7 +40,8 @@ class WordDetailViewModel @AssistedInject constructor(
                     _uiState.value = WordDetailUiState.Error("發生錯誤: ${e.localizedMessage}")
                 }
                 .collect { word ->
-                    _uiState.value = WordDetailUiState.Success(word)
+                    val isExist = wordRepository.isWordExist(wordId)
+                    _uiState.value = WordDetailUiState.Success(word, isExist)
                 }
         }
     }
@@ -63,59 +57,19 @@ class WordDetailViewModel @AssistedInject constructor(
         exoPlayer.play()
     }
 
-    fun saveWord(word: ShowWord) {
-//        viewModelScope.launch {
-//            authRepository.getCurrentUserUid().collectLatest { userUid ->
-//                wordRepository.saveWordToLocal(showWord = word)
-//                isWordExist(word)
-//                if (!userUid.isNullOrEmpty()) {
-//                    wordRepository.saveWordToFirestore(showWord = word, userUid = userUid)
-//                } else {
-//                    Log.i("Room", "saveWord: userUid is empty")
-//                }
-//            }
-//
-//        }
+
+    fun saveWord() {
+        viewModelScope.launch {
+            wordRepository.saveWord(wordId)
+        }
     }
 
-//    fun saveWord() {
-//        viewModelScope.launch {
-//            authRepository.getCurrentUserUid().collectLatest { userUid ->
-//                wordRepository.saveWordToLocal(wordId = wordId)
-//                isWordExist(wordId = wordId)
-//                if (!userUid.isNullOrEmpty()) {
-//                    wordRepository.saveWordToFirestore(wordId = wordId, userUid = userUid)
-//                } else {
-//                    Timber.i("Room, saveWord: userUid is empty")
-//                }
-//            }
-//        }
-//    }
-
-    fun deleteWord(word: ShowWord) {
-//        viewModelScope.launch {
-//            authRepository.getCurrentUserUid().collectLatest { userUid ->
-//                wordRepository.deleteWordForLocal(word = word)
-//                isWordExist(word)
-//                if (!userUid.isNullOrEmpty()) {
-//                    wordRepository.deleteWordForFirestore(showWord = word, userUid = userUid)
-//                } else {
-//                    Log.i("Room", "deleteWord: userUid is empty")
-//                }
-//            }
-//        }
+    fun deleteWord() {
+        viewModelScope.launch {
+            wordRepository.deleteWord(wordId)
+        }
     }
 
-    fun isWordExist(word: ShowWord) {
-//        viewModelScope.launch {
-//            val isExist = wordRepository.isWordExistInLocal(word = word)
-//            _uiState.update { currentState ->
-//                currentState.copy(
-//                    isFavorite = isExist
-//                )
-//            }
-//        }
-    }
 
     @AssistedFactory
     interface Factory {
@@ -126,7 +80,7 @@ class WordDetailViewModel @AssistedInject constructor(
 }
 
 sealed interface WordDetailUiState {
-    data class Success(val word: ShowWord) : WordDetailUiState
+    data class Success(val word: ShowWord, val isFavorite: Boolean = false) : WordDetailUiState
     data object Loading : WordDetailUiState
     data class Error(val errorMessage: String) : WordDetailUiState
 }
