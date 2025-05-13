@@ -17,11 +17,11 @@ interface AuthRepository {
     fun getCurrentUserUid(): Flow<String?>
     fun getUserInformation(uid: String?): Flow<User?>
     fun hasUser(): Boolean
-    fun signIn(email: String, password: String): Flow<Boolean>
-    fun signUp(name: String, email: String, password: String): Flow<Boolean>
+    suspend fun signIn(email: String, password: String): Boolean
+    suspend fun signUp(name: String, email: String, password: String): Boolean
     suspend fun signOut()
 
     // DataStore
-    suspend fun getUserUid(): String?
-    suspend fun saveUserUid(userUid: String?)
+//    suspend fun getUserUid(): String?
+//    suspend fun saveUserUid(userUid: String?)
 }

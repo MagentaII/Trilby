@@ -1,7 +1,7 @@
 package com.example.trilby.data.data_sources.firebase.auth
 
-import android.util.Log
 import com.example.trilby.data.data_sources.firebase.UserFirebaseDataSource
+import com.example.trilby.data.data_sources.firebase.model.FbUser
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -10,10 +10,9 @@ import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 import javax.inject.Inject
 
 class FirebaseUserAuth @Inject constructor(
@@ -22,7 +21,7 @@ class FirebaseUserAuth @Inject constructor(
 ) : UserFirebaseDataSource {
 
     private val _currentUserFlow = MutableStateFlow(auth.currentUser)
-    val currentUserFlow: StateFlow<FirebaseUser?> = _currentUserFlow.asStateFlow()
+//    val currentUserFlow: StateFlow<FirebaseUser?> = _currentUserFlow.asStateFlow()
 
     init {
         auth.addAuthStateListener { firebaseAuth ->
@@ -31,7 +30,7 @@ class FirebaseUserAuth @Inject constructor(
     }
 
     override fun currentUser(): Flow<FirebaseUser?> {
-        return currentUserFlow
+        return _currentUserFlow
     }
 
     override fun getCurrentUserUid(): Flow<String?> {
@@ -40,26 +39,24 @@ class FirebaseUserAuth @Inject constructor(
         }
     }
 
-    override suspend fun getUserInformation(uid: String?): com.example.trilby.data.data_sources.firebase.model.FbUser? {
+    override suspend fun getUserInformation(uid: String?): FbUser? {
         val db = firebase.firestore
         return try {
             if (uid != null) {
-                Log.i("Firestore", "getUserInformation: $uid")
                 val document = db.collection("users").document(uid).get().await()
                 if (document.exists()) {
-                    Log.i("Firestore", "getUserInformation: ${document.exists()}")
-                    document.toObject<com.example.trilby.data.data_sources.firebase.model.FbUser>()
+                    document.toObject<FbUser>()
                 } else {
-                    Log.i("Firestore", "getUserInformation: document no exists ")
+                    Timber.e("Not found user information")
                     null
                 }
             } else {
-                Log.i("Firestore", "getUserInformation: UID is empty")
+                Timber.e("User uid is null")
                 null
             }
         } catch (e: Exception) {
-            Log.e("Firestore", "獲取用戶資訊失敗: ${e.message}")
-            null // 發生錯誤時回傳 `null`
+            Timber.e("Error while getting user information: $e")
+            null
         }
     }
 
@@ -83,7 +80,7 @@ class FirebaseUserAuth @Inject constructor(
             val userId = result.user?.uid
 
             if (userId != null) {
-                val user = hashMapOf(
+                val user = mapOf(
                     "name" to name,
                     "email" to email,
                     "createdAt" to FieldValue.serverTimestamp()
@@ -100,7 +97,11 @@ class FirebaseUserAuth @Inject constructor(
     }
 
     override suspend fun signOut() {
-        auth.signOut()
+        try {
+            auth.signOut()
+        } catch (e: Exception) {
+            Timber.e("Sign out error: $e")
+        }
     }
 }
 

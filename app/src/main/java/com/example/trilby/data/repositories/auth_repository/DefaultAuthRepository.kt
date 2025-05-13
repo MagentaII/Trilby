@@ -1,12 +1,9 @@
 package com.example.trilby.data.repositories.auth_repository
 
-import android.util.Log
-import com.example.trilby.data.data_sources.database.dao.WordDao
 import com.example.trilby.data.data_sources.datastore.UserPreferences
 import com.example.trilby.data.data_sources.firebase.UserFirebaseDataSource
-import com.example.trilby.data.data_sources.firebase.WordFirebaseDataSource
+import com.example.trilby.data.data_sources.firebase.model.toExternalModel
 import com.example.trilby.data.repositories.auth_repository.model.User
-import com.example.trilby.data.repositories.auth_repository.util.toExternal
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -34,7 +31,7 @@ class DefaultAuthRepository @Inject constructor(
         return flow {
             val userInfo = userFirebaseDataSource.getUserInformation(uid)
             if (userInfo != null) {
-                emit(userInfo.toExternal())
+                emit(userInfo.toExternalModel())
             } else {
                 Timber.e("$uid, 取得使用者資訊錯誤: userInfo is null")
                 emit(null)
@@ -48,34 +45,48 @@ class DefaultAuthRepository @Inject constructor(
         return userFirebaseDataSource.hasUser()
     }
 
-    override fun signIn(email: String, password: String): Flow<Boolean> {
-        return flow {
-            userFirebaseDataSource.signIn(email, password)
-        }.catch { e ->
-            Timber.e("登入錯誤: $e")
+    override suspend fun signIn(email: String, password: String): Boolean {
+        return try {
+            withContext(Dispatchers.IO) {
+                userFirebaseDataSource.signIn(email, password)
+            }
+        } catch (e: Exception) {
+            Timber.e("登入失敗: $e")
+            false
         }
-        val result = userFirebaseDataSource.signIn(email, password)
-        return result
     }
 
-    override fun signUp(name: String, email: String, password: String): Flow<Boolean> {
-        val result = userFirebaseDataSource.signUp(name, email, password)
-        return result
+    override suspend fun signUp(name: String, email: String, password: String): Boolean {
+        return try {
+            withContext(Dispatchers.IO) {
+                userFirebaseDataSource.signUp(name, email, password)
+            }
+        } catch (e: Exception) {
+            Timber.e("註冊失敗: $e")
+            false
+        }
     }
 
     override suspend fun signOut() {
-        userFirebaseDataSource.signOut()
+        try {
+            withContext(Dispatchers.IO) {
+                userFirebaseDataSource.signOut()
+            }
+        } catch (e: Exception) {
+            Timber.e("Sign out error: $e")
+        }
+
     }
 
-    override suspend fun getUserUid(): String? {
-        return withContext(Dispatchers.IO) {
-            userPreferences.getUserUid()
-        }
-    }
-
-    override suspend fun saveUserUid(userUid: String?) {
-        withContext(Dispatchers.IO) {
-            userPreferences.saveUserUid(userUid)
-        }
-    }
+//    override suspend fun getUserUid(): String? {
+//        return withContext(Dispatchers.IO) {
+//            userPreferences.getUserUid()
+//        }
+//    }
+//
+//    override suspend fun saveUserUid(userUid: String?) {
+//        withContext(Dispatchers.IO) {
+//            userPreferences.saveUserUid(userUid)
+//        }
+//    }
 }

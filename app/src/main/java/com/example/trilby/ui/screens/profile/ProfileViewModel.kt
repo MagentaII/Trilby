@@ -34,30 +34,30 @@ open class ProfileViewModel @Inject constructor(
     }
 
     private fun observeCurrentUser() {
-        viewModelScope.launch {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    isLoading = true
-                )
-            }
-            authRepository.currentUser().collect { firebaseUser ->
-                val user = authRepository.getUserInformation(firebaseUser?.uid)
-                Log.i("Firestore", "observeCurrentUser: ${user?.name}")
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        currentUser = user,
-                        isLoading = false,
-                    )
-                }
-            }
-        }
+//        viewModelScope.launch {
+//            _uiState.update { currentState ->
+//                currentState.copy(
+//                    isLoading = true
+//                )
+//            }
+//            authRepository.currentUser().collect { firebaseUser ->
+//                val user = authRepository.getUserInformation(firebaseUser?.uid)
+//                Log.i("Firestore", "observeCurrentUser: ${user?.name}")
+//                _uiState.update { currentState ->
+//                    currentState.copy(
+//                        currentUser = user,
+//                        isLoading = false,
+//                    )
+//                }
+//            }
+//        }
     }
 
     open fun signOut() {
-        viewModelScope.launch {
-            authRepository.signOut()
-            wordRepository.deleteAllWordsForLocal()
-        }
+//        viewModelScope.launch {
+//            authRepository.signOut()
+//            wordRepository.deleteAllWordsForLocal()
+//        }
     }
 
     fun showBottomSheet() {

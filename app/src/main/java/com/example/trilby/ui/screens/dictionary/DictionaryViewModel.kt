@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.trilby.data.repositories.word_repository.model.ShowWord
+import com.example.trilby.data.repositories.word_repository.model.WordForUi
 import com.example.trilby.data.repositories.word_repository.WordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +36,7 @@ class DictionaryViewModel @Inject constructor(
         if (searchQuery.isBlank()) return
         viewModelScope.launch {
             wordRepository.searchWords(searchQuery)
-            wordRepository.getWords()
+            wordRepository.getNetworkWords()
                 .onStart { _uiState.value = DictionaryUiState.Loading }
                 .catch { e ->
                     _uiState.value = DictionaryUiState.Error("搜尋單字失敗: ${e.localizedMessage}")
@@ -49,7 +49,7 @@ class DictionaryViewModel @Inject constructor(
 }
 
 sealed interface DictionaryUiState {
-    data class Success(val words: List<ShowWord>) : DictionaryUiState
+    data class Success(val words: List<WordForUi>) : DictionaryUiState
     data object Loading : DictionaryUiState
     data class Error(val errorMessage: String) : DictionaryUiState
 }

@@ -1,7 +1,7 @@
 package com.example.trilby.navigation
 
 import androidx.lifecycle.ViewModel
-import com.example.trilby.data.repositories.word_repository.model.ShowWord
+import com.example.trilby.data.repositories.word_repository.model.WordForUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 data class SharedUiState(
-    val words: List<ShowWord> = emptyList()
+    val words: List<WordForUi> = emptyList()
 )
 
 @HiltViewModel
@@ -18,7 +18,7 @@ class SharedViewModel @Inject constructor() : ViewModel() {
     private val _uiState = MutableStateFlow(SharedUiState())
     val uiState: StateFlow<SharedUiState> = _uiState.asStateFlow()
 
-    fun updateWords(newWords: List<ShowWord>) {
+    fun updateWords(newWords: List<WordForUi>) {
         _uiState.update { currentState ->
             currentState.copy(
                 words = newWords

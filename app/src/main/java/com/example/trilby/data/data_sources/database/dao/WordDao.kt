@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface WordDao {
 
-    @Insert
-    suspend fun insertWord(word: WordEntity)
+//    @Insert
+//    suspend fun insertWord(word: WordEntity)
 
     @Insert
     suspend fun insertWords(words: List<WordEntity>)
@@ -20,7 +20,10 @@ interface WordDao {
     suspend fun deleteWords(words: List<WordEntity>)
 
     @Query("SELECT * FROM WordEntity")
-    fun getAllWords(): Flow<List<WordEntity>>
+    fun getAllWords(): Flow<List<WordEntity>> // 即時反應資料庫變化
+
+    @Query("SELECT * FROM WordEntity WHERE id LIKE :id || '%'")
+    fun getWordById(id: String): List<WordEntity>
 
     @Query("SELECT EXISTS(SELECT 1 FROM WordEntity WHERE id = :id)")
     suspend fun isWordExist(id: String): Boolean

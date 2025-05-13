@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.trilby.data.repositories.word_repository.model.ShowWord
+import com.example.trilby.data.repositories.word_repository.model.WordForUi
 import com.example.trilby.data.repositories.word_repository.model.WordPrs
 import com.example.trilby.ui.util.DetailTopAppBar
 import timber.log.Timber
@@ -96,7 +96,7 @@ fun WordDetailView(
 
 @Composable
 internal fun WordDetailScreen(
-    word: ShowWord?,
+    word: WordForUi?,
     isFavorite: Boolean,
     onPlayAudioClick: (WordPrs) -> Unit,
     onBackClick: () -> Unit,
@@ -107,7 +107,7 @@ internal fun WordDetailScreen(
     Scaffold(
         topBar = {
             DetailTopAppBar(
-                title = "Error",
+                title = word?.wordId ?: "Error",
                 onBackClick = onBackClick,
                 onSaveWord = onSaveWord,
                 onDeleteWord = onDeleteWord,
@@ -125,7 +125,7 @@ internal fun WordDetailScreen(
             // Header Section
             Timber.d("WordDetailView, headwords: $word")
             HeaderSection(
-                word = word?.uid ?: "Error"
+                word = word?.wordId ?: "Error"
             )
 
             Spacer(Modifier.height(14.dp))

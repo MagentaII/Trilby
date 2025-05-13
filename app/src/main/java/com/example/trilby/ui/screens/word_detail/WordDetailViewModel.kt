@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import com.example.trilby.data.repositories.word_repository.WordRepository
-import com.example.trilby.data.repositories.word_repository.model.ShowWord
+import com.example.trilby.data.repositories.word_repository.model.WordForUi
 import com.example.trilby.data.repositories.word_repository.model.WordPrs
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -15,7 +15,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = WordDetailViewModel.Factory::class)
@@ -35,16 +34,30 @@ class WordDetailViewModel @AssistedInject constructor(
     private fun loadingWordDetail() {
         viewModelScope.launch {
             _uiState.value = WordDetailUiState.Loading
-            wordRepository.getWordById(wordId)
-                .catch { e ->
+            val word = wordRepository.getWordById(wordId)
+            if (word != WordForUi.empty) {
+                val isExistResult = wordRepository.isWordExistInLocal(wordId)
+                val isExist = isExistResult.getOrElse { e ->
                     _uiState.value = WordDetailUiState.Error("發生錯誤: ${e.localizedMessage}")
+                    false
                 }
-                .collect { word ->
-                    val isExist = wordRepository.isWordExist(wordId)
-                    _uiState.value = WordDetailUiState.Success(word, isExist)
-                }
+                _uiState.value = WordDetailUiState.Success(word, isExist)
+            } else {
+                _uiState.value = WordDetailUiState.Error("發生錯誤: 無此單字")
+            }
         }
-    }
+
+//        viewModelScope.launch {
+//            _uiState.value = WordDetailUiState.Loading
+//            wordRepository.getWordById(wordId)
+//                .catch { e ->
+//                    _uiState.value = WordDetailUiState.Error("發生錯誤: ${e.localizedMessage}")
+//                }
+//                .collect { word ->
+//                    val isExist = wordRepository.isWordExistInLocal(wordId)
+//                    _uiState.value = WordDetailUiState.Success(word, isExist)
+//                }
+        }
 
 
     fun playWordAudio(wordPrs: WordPrs) {
@@ -60,13 +73,13 @@ class WordDetailViewModel @AssistedInject constructor(
 
     fun saveWord() {
         viewModelScope.launch {
-            wordRepository.saveWord(wordId)
+            wordRepository.saveWordToLocal(wordId)
         }
     }
 
     fun deleteWord() {
         viewModelScope.launch {
-            wordRepository.deleteWord(wordId)
+            wordRepository.deleteWordFromLocal(wordId)
         }
     }
 
@@ -80,7 +93,7 @@ class WordDetailViewModel @AssistedInject constructor(
 }
 
 sealed interface WordDetailUiState {
-    data class Success(val word: ShowWord, val isFavorite: Boolean = false) : WordDetailUiState
+    data class Success(val word: WordForUi, val isFavorite: Boolean = false) : WordDetailUiState
     data object Loading : WordDetailUiState
     data class Error(val errorMessage: String) : WordDetailUiState
 }

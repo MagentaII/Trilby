@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trilby.data.repositories.auth_repository.AuthRepository
-import com.example.trilby.data.repositories.word_repository.model.ShowWord
+import com.example.trilby.data.repositories.word_repository.model.WordForUi
 import com.example.trilby.data.repositories.word_repository.WordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class FavoritesUiState(
-    val savedWords: List<ShowWord> = emptyList(),
+    val savedWords: List<WordForUi> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
 )
@@ -41,22 +41,22 @@ class FavoritesViewModel @Inject constructor(
     }
 
     private fun observeUserUid() {
-        viewModelScope.launch {
-            val storeUserUid = authRepository.getUserUid()
-            authRepository.getCurrentUserUid().collectLatest { userUid ->
-                if (userUid == null) {
-                    wordRepository.deleteAllWordsForLocal()
-                    authRepository.saveUserUid(userUid)
-                }
-                if (storeUserUid != userUid) {
-                    Log.i("TAG", "observeUserUid: user change")
-                    wordRepository.deleteAllWordsForLocal()
-                    authRepository.saveUserUid(userUid)
-                }
-                Log.i("TAG", "observeUserUid: observeWords")
-                observeWords(userUid = userUid)
-            }
-        }
+//        viewModelScope.launch {
+//            val storeUserUid = authRepository.getUserUid()
+//            authRepository.getCurrentUserUid().collectLatest { userUid ->
+//                if (userUid == null) {
+//                    wordRepository.deleteAllWordsFromLocal()
+//                    authRepository.saveUserUid(userUid)
+//                }
+//                if (storeUserUid != userUid) {
+//                    Log.i("TAG", "observeUserUid: user change")
+//                    wordRepository.deleteAllWordsFromLocal()
+//                    authRepository.saveUserUid(userUid)
+//                }
+//                Log.i("TAG", "observeUserUid: observeWords")
+//                observeWords(userUid = userUid)
+//            }
+//        }
     }
 
     private fun observeWords(userUid: String?) {
@@ -67,7 +67,7 @@ class FavoritesViewModel @Inject constructor(
                     isLoading = true,
                 )
             }
-            wordRepository.fetchAllWordsToLocal(userUid = userUid)
+            wordRepository.getAllLocalWords()
                 .collectLatest { words ->
                     _uiState.update { currentState ->
                         currentState.copy(

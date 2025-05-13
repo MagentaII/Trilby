@@ -15,12 +15,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.trilby.data.repositories.word_repository.model.ShowWord
+import com.example.trilby.data.repositories.word_repository.model.WordForUi
 import timber.log.Timber
 
 @Composable
 fun WordCard(
-    word: ShowWord,
+    word: WordForUi,
 //    onNavigateToDetail: (route: Route) -> Unit,
     onItemClick: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -31,7 +31,7 @@ fun WordCard(
         colors = CardDefaults.cardColors().copy(containerColor = Color.White),
         shape = RectangleShape,
         border = BorderStroke(1.dp, Color.LightGray),
-        onClick = {onItemClick(word.uid)}
+        onClick = {onItemClick(word.wordId)}
 //        onClick = {
 //            onNavigateToDetail(
 //                Route.WordDetail(
@@ -41,7 +41,7 @@ fun WordCard(
 //        },
     ) {
         Text(
-            text = word.uid,
+            text = word.wordId,
             style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Medium),
             modifier = Modifier.padding(start = 17.dp, top = 20.dp, bottom = 20.dp)
         )
@@ -52,8 +52,8 @@ fun WordCard(
 @Preview
 @Composable
 private fun WordCardView() {
-    val defaultWord = ShowWord(
-        uid = "book",
+    val defaultWord = WordForUi(
+        wordId = "book",
         words = emptyList()
     )
 
