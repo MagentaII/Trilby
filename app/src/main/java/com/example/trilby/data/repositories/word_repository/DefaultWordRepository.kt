@@ -90,6 +90,16 @@ class DefaultWordRepository @Inject constructor(
         }
     }
 
+    override suspend fun saveAllWordToLocal(words: List<WordForUi>) {
+        try {
+            withContext(Dispatchers.IO) {
+                wordDao.insertWords(words.flatMap { it.toEntity() })
+            }
+        } catch (e: Exception) {
+            Timber.e("本地全部單字儲存失敗: $e")
+        }
+    }
+
     override suspend fun deleteWordFromLocal(id: String) {
 //        val word = _cachedWords.value.find { it.uid == id }
         val word = _selectWord.value

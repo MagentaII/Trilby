@@ -31,6 +31,7 @@ interface WordRepository {
 
     // for Local
     suspend fun saveWordToLocal(id: String)
+    suspend fun saveAllWordToLocal(words: List<WordForUi>)
     suspend fun deleteWordFromLocal(id: String)
     suspend fun deleteAllWordsFromLocal()
     suspend fun isWordExistInLocal(id: String): Result<Boolean>
